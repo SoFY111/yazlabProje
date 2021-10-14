@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
-import { Avatar, Button, Dialog, Divider, FAB, List, Portal, TextInput } from "react-native-paper";
+import { Avatar, Button, Dialog, Divider, FAB, List, Portal, Text, TextInput } from "react-native-paper";
 // import firestore from '@react-native-firebase/firestore'
 // import auth from "@react-native-firebase/auth";
 import {useNavigation} from "@react-navigation/core";
+import { useDispatch, useSelector } from "react-redux";
 
 const ChatList = () => {
 
@@ -12,6 +13,13 @@ const ChatList = () => {
   const [userEmail, setUserEmail] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const navigation = useNavigation()
+
+  const isSignedIn = useSelector((state) => state.isUserSignedIn)
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    if(!isSignedIn) navigation.navigate('SignIn')
+  }, [isSignedIn])
 
   /*useEffect(()=>{
     auth().onAuthStateChanged(user => {
@@ -42,8 +50,8 @@ const ChatList = () => {
 
   return (
     <View style={{ flex: 1 }}>
-
-      {chats.map(chat => (
+      <Text>Application's Pages</Text>
+      {/*{chats.map(chat => (
         <React.Fragment>
           <List.Item
             title="ds"
@@ -72,7 +80,7 @@ const ChatList = () => {
         icon="plus"
         style={{ position: "absolute", bottom: 16, right: 16 }}
         onPress={() => setIsDialogVisible(true)}
-      />
+      />*/}
     </View>
   );
 };

@@ -3,6 +3,9 @@ import { Image, View } from "react-native";
 import { Avatar, Button, Subheading, Text, TextInput } from "react-native-paper";
 import { useNavigation } from "@react-navigation/core";
 
+import { useSelector, useDispatch } from 'react-redux'
+import { userAuthChange }  from '../redux/actions/isUserSignedInAction'
+
 import auth from "@react-native-firebase/auth";
 
 import kouLogo from '../src/pictures/kou-logo.png'
@@ -10,16 +13,19 @@ import kouLogo from '../src/pictures/kou-logo.png'
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
   const navigation = useNavigation();
 
+  const dispatch = useDispatch()
+  const isSigned = useSelector((state) => state.isUserSignedIn)
+
   const signIn = async () => {
     setIsLoading(true);
     try {
       await auth().signInWithEmailAndPassword(email, password);
+      dispatch(userAuthChange())
       navigation.navigate('Main');
     } catch (e) {
       setIsLoading(false);
