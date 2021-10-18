@@ -6,7 +6,7 @@ import { Avatar, Button, Dialog, Divider, FAB, List, Portal, Text, TextInput } f
 import {useNavigation} from "@react-navigation/core";
 import { useDispatch, useSelector } from "react-redux";
 
-const ChatList = () => {
+const Application = () => {
 
   const [isDialogVisible, setIsDialogVisible] = useState(false)
   const [email, setEmail] = useState('')
@@ -85,4 +85,4 @@ const ChatList = () => {
   );
 };
 
-export default ChatList;
+export default Application;

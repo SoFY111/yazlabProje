@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Image, View } from "react-native";
 import { Avatar, Button, Subheading, Text, TextInput } from "react-native-paper";
 import { useNavigation } from "@react-navigation/core";
@@ -21,11 +21,13 @@ const SignIn = () => {
   const dispatch = useDispatch()
   const isSigned = useSelector((state) => state.isUserSignedIn)
 
+
   const signIn = async () => {
     setIsLoading(true);
     try {
       await auth().signInWithEmailAndPassword(email, password);
       dispatch(userAuthChange())
+      setIsLoading(false);
       navigation.navigate('Main');
     } catch (e) {
       setIsLoading(false);
