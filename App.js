@@ -6,7 +6,7 @@
  * @flow strict-local
  */
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { BackHandler } from "react-native";
 import { DefaultTheme, Provider as PaperProvider } from "react-native-paper";
 import { NavigationContainer } from "@react-navigation/native";
@@ -19,9 +19,9 @@ import SignIn from "./screens/SignIn";
 import SignUp from "./screens/SignUp";
 import Profile from "./screens/Profile";
 import Applications from "./screens/Applications";
+import DoubleMajorNecessaryPapers from "./screens/DoubleMajorNecessaryPapers ";
 
-import {useSelector, useDispatch, Provider } from "react-redux";
-import store from "./redux/store";
+import { useSelector } from "react-redux";
 
 import auth from "@react-native-firebase/auth";
 
@@ -46,36 +46,74 @@ const TabsNavigator = () => {
     });
   }, []);
   return (
-    <Tabs.Navigator options={{headerShown: false}} screenOptions={({ route }) => ({
+    <Tabs.Navigator options={{ headerShown: false }} screenOptions={({ route }) => ({
       tabBarIcon: ({ focused, color, size }) => {
         return <Icon name={route.name === "Başvurular" ? "albums" : "person"} type="ionicon" color={color}
                      size={size} />;
       },
     })}>
-      <Tabs.Screen name="Başvurular" component={Applications}/>
-      <Tabs.Screen name="Profil" component={Profile} />
+      <Tabs.Screen name="Başvurular" component={ApplicationStackScreen}
+                   options={{ title: "BAŞVURULAR", headerTitleAlign: "center" }} />
+      <Tabs.Screen name="Profil" component={ProfileStackScreen} />
+      {/*<Tabs.Screen name="DoubleMajorNecessaryPapers" component={DoubleMajorNecessaryPapers} />*/}
     </Tabs.Navigator>
   );
 };
 
-const App = () => {
-
-  useEffect(() => {
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => true)
-    return () => backHandler.remove()
-  }, [])
+const ApplicationStack = createNativeStackNavigator();
+const ApplicationStackScreen = () => {
   return (
-    <Provider store={store}>
-      <PaperProvider theme={theme}>
-        <NavigationContainer>
-          <Stack.Navigator screenOptions={{headerShown: true }} initialRouteName="SignIn">
-            <Stack.Screen name="SignIn" component={SignIn}  options={{ presentation: "fullScreenModal", headerShown: false, headerBackVisible: false }} />
-            <Stack.Screen name="SignUp" component={SignUp} options={{ presentation: "fullScreenModal", headerBackVisible: true, title: 'KAYIT OL', headerTitleAlign:'center' }} />
-            <Stack.Screen name="Main" component={TabsNavigator} options={{ presentation: "fullScreenModal", headerShown: false}} />
+    <ApplicationStack.Navigator>
+      <ProfileStack.Screen name="Applications" component={Applications}
+                           options={{ title: "BAŞVURULAR", headerTitleAlign: "center" }} />
+      <ProfileStack.Screen name="DoubleMajorNecessaryPapers" component={DoubleMajorNecessaryPapers} options={{title:'ÇAP Gerekli Evraklar', headerTitleAlign:'center'}}/>
+    </ApplicationStack.Navigator>
+  );
+};
+
+const ProfileStack = createNativeStackNavigator();
+const ProfileStackScreen = () => {
+  return (
+    <ProfileStack.Navigator>
+      <ProfileStack.Screen name="Profile" component={Profile}
+                           options={{ title: "PROFİL", headerTitleAlign: "center" }} />
+    </ProfileStack.Navigator>
+  );
+};
+
+const App = () => {
+  const isSignedIn = useSelector((state) => state.isUserSignedIn);
+  console.log(isSignedIn);
+  return (
+    <PaperProvider theme={theme}>
+      <NavigationContainer>
+        {!isSignedIn ?
+          <Stack.Navigator screenOptions={{ headerShown: true }}>
+            <Stack.Screen name="SignIn" component={SignIn}
+                          options={{ presentation: "fullScreenModal", headerShown: false, headerBackVisible: false }} />
+            <Stack.Screen name="SignUp" component={SignUp} options={{
+              presentation: "fullScreenModal",
+              headerBackVisible: true,
+              title: "KAYIT OL",
+              headerTitleAlign: "center",
+            }} />
           </Stack.Navigator>
-        </NavigationContainer>
-      </PaperProvider>
-    </Provider>
+          :
+
+          <Tabs.Navigator options={{ headerShown: false }} screenOptions={({ route }) => ({
+            tabBarIcon: ({ focused, color, size }) => {
+              return <Icon name={route.name === "Başvurular" ? "albums" : "person"} type="ionicon" color={color}
+                           size={size} />;
+            },
+            headerShown: false,
+          })}>
+            <Tabs.Screen name="Başvurular" component={ApplicationStackScreen} />
+            <Tabs.Screen name="Profil" component={ProfileStackScreen} />
+          </Tabs.Navigator>
+
+        }
+      </NavigationContainer>
+    </PaperProvider>
   );
 };
 

@@ -9,6 +9,8 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 
 import auth from "@react-native-firebase/auth";
 import firestore from "@react-native-firebase/firestore";
+import { useDispatch } from "react-redux";
+import { userAuthChange } from "../redux/actions/isUserSignedInAction";
 
 const SignUp = () => {
   const [studentNumber, setStudentNumber] = useState("");
@@ -29,6 +31,7 @@ const SignUp = () => {
   const [error, setError] = useState("");
 
   const navigation = useNavigation();
+  const dispatch = useDispatch()
 
   const createAccount = async () => {
     setIsLoading(true);
@@ -47,7 +50,8 @@ const SignUp = () => {
         departmant,
       });
       setIsLoading(false);
-      navigation.navigate("Main");
+      await auth().signInWithEmailAndPassword(email, password);
+      dispatch(userAuthChange())
     } catch (e) {
       setIsLoading(false);
       console.warn(e.message);

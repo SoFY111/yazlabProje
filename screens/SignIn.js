@@ -19,7 +19,6 @@ const SignIn = () => {
   const navigation = useNavigation();
 
   const dispatch = useDispatch()
-  const isSigned = useSelector((state) => state.isUserSignedIn)
 
 
   const signIn = async () => {
@@ -28,7 +27,6 @@ const SignIn = () => {
       await auth().signInWithEmailAndPassword(email, password);
       dispatch(userAuthChange())
       setIsLoading(false);
-      navigation.navigate('Main');
     } catch (e) {
       setIsLoading(false);
       console.warn(e.message);

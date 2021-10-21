@@ -1,44 +1,34 @@
 import React, { useEffect, useState } from "react";
-import { View } from "react-native";
-import { Avatar, Button, Dialog, Divider, FAB, List, Portal, Text, TextInput } from "react-native-paper";
+import { Button, ScrollView, StyleSheet, View } from "react-native";
+import { Button as MUIButton, Text } from "react-native-paper";
 // import firestore from '@react-native-firebase/firestore'
-// import auth from "@react-native-firebase/auth";
-import {useNavigation} from "@react-navigation/core";
+import auth from "@react-native-firebase/auth";
+import { useNavigation } from "@react-navigation/core";
+
 import { useDispatch, useSelector } from "react-redux";
 
 const Application = () => {
 
-  const [isDialogVisible, setIsDialogVisible] = useState(false)
-  const [email, setEmail] = useState('')
-  const [userEmail, setUserEmail] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const navigation = useNavigation()
+  const [isDialogVisible, setIsDialogVisible] = useState(false);
+  const [email, setEmail] = useState("");
+  const [userEmail, setUserEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const navigation = useNavigation();
 
-  const isSignedIn = useSelector((state) => state.isUserSignedIn)
-  const dispatch = useDispatch()
+  const isSignedIn = useSelector((state) => state.isUserSignedIn);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    if(!isSignedIn) navigation.navigate('SignIn')
-  }, [isSignedIn])
+    if (!isSignedIn) navigation.navigate("SignIn");
+  }, [isSignedIn]);
 
-  /*useEffect(()=>{
+  useEffect(() => {
     auth().onAuthStateChanged(user => {
-      setEmail(user?.email ?? '')
-    })
-  }, [])*/
+      setEmail(user?.email ?? "");
+    });
+  }, []);
 
-  /*const createChat = async () => {
-    if (!email || !userEmail) return
-    setIsLoading(true)
-    const response = await firestore().collection('chats').add({
-      users: [email, userEmail]
-    })
-    setIsLoading(false)
-    setIsDialogVisible(false)
-    navigation.navigate('Chat', {chatId: response.id})
-  }*/
-
-  const [chats, setChats] = useState([])
+  const [chats, setChats] = useState([]);
   /*useEffect(()=>{
     return firestore()
       .collection('chats')
@@ -49,8 +39,34 @@ const Application = () => {
   },[email])*/
 
   return (
-    <View style={{ flex: 1 }}>
-      <Text>Application's Pages</Text>
+    <View style={{ flex: 1, padding: 16 }}>
+      <View style={{paddingBottom:14, borderBottomWidth:1 , borderBottomColor:'rgba(0,0,0,.2)'}}>
+        <Text>Devam Eden Başvurular</Text>
+        <View>
+          <Text>Başvuru 1</Text>
+          <Text>Başvuru 2</Text>
+          <Text>Başvuru 3</Text>
+          <Text>Başvuru 4</Text>
+          <Text>Başvuru 5</Text>
+        </View>
+      </View>
+      <ScrollView style={{ width: "100%", marginTop:14 }}>
+        <MUIButton style={styles.boxes} mode="contained" theme={{ roundness: 3 }} onPress={() => navigation.navigate('DoubleMajorNecessaryPapers')}>
+          <Text style={styles.texts}>{"çap başvuru".toLocaleUpperCase()}</Text>
+        </MUIButton>
+        <MUIButton style={styles.boxes} mode="contained" theme={{ roundness: 3 }} onPress={() => console.log(isSignedIn)}>
+          <Text style={styles.texts}>{"dgs başvuru".toLocaleUpperCase()}</Text>
+        </MUIButton>
+        <MUIButton style={styles.boxes} mode="contained" theme={{ roundness: 3 }} onPress={() => console.log(isSignedIn)}>
+          <Text style={styles.texts}>{"yatay geçiş başvuru".toLocaleUpperCase()}</Text>
+        </MUIButton>
+        <MUIButton style={styles.boxes} mode="contained" theme={{ roundness: 3 }} onPress={() => console.log(isSignedIn)}>
+          <Text style={styles.texts}>{"yaz okulu başvuru".toLocaleUpperCase()}</Text>
+        </MUIButton>
+        <MUIButton style={styles.boxes} mode="contained" theme={{ roundness: 3 }} onPress={() => console.log(isSignedIn)}>
+          <Text style={styles.texts}>{"ders intibak başvuru".toLocaleUpperCase()}</Text>
+        </MUIButton>
+      </ScrollView>
       {/*{chats.map(chat => (
         <React.Fragment>
           <List.Item
@@ -84,5 +100,18 @@ const Application = () => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  boxes:{
+    width:'100%',
+    marginTop:8,
+    paddingTop: 6,
+    paddingBottom: 6,
+    borderRadius:6
+  },
+  texts: {
+    color: "#fff",
+  },
+});
 
 export default Application;
