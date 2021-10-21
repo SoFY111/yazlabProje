@@ -110,7 +110,6 @@ const App = () => {
             <Tabs.Screen name="Başvurular" component={ApplicationStackScreen} />
             <Tabs.Screen name="Profil" component={ProfileStackScreen} />
           </Tabs.Navigator>
-
         }
       </NavigationContainer>
     </PaperProvider>

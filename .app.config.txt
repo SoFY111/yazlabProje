@@ -1,0 +1,17 @@
+{
+    0: Öğrenci
+    1: Öğretmen
+    2: Süper Admin
+}
+{
+    0: ÇAP
+    1: DGS,
+    2: Yatay Geçiş,
+    3: Yaz Okulu
+    4: Ders İntibak
+}
+{
+    0: BAŞVURU YAPMADI
+    1: BAŞVURU TAMAMLANDI
+    2: BAŞVURU DEVAM EDİYOR
+}

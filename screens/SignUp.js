@@ -35,7 +35,7 @@ const SignUp = () => {
 
   const createAccount = async () => {
     setIsLoading(true);
-    try {
+    try { /*try catch ekle eğer collection eklenmezse user'ı sil*/
       const response = await auth().createUserWithEmailAndPassword(email, password);
       await response.user.updateProfile({
         displayName: name,
@@ -48,6 +48,8 @@ const SignUp = () => {
         ogrSinif,
         faculty,
         departmant,
+        type:0,
+        created: firestore().Timestamp.now()
       });
       setIsLoading(false);
       await auth().signInWithEmailAndPassword(email, password);
