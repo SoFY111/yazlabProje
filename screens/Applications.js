@@ -51,19 +51,19 @@ const Application = () => {
         </View>
       </View>
       <ScrollView style={{ width: "100%", marginTop:14 }}>
-        <MUIButton style={styles.boxes} mode="contained" theme={{ roundness: 3 }} onPress={() => navigation.navigate('DoubleMajorNecessaryPapers')}>
+        <MUIButton style={styles.boxes} mode="contained" theme={{ roundness: 3 }} onPress={() => navigation.navigate('NecessaryPapers', {type:'DoubleMajor'})}>
           <Text style={styles.texts}>{"çap başvuru".toLocaleUpperCase()}</Text>
         </MUIButton>
-        <MUIButton style={styles.boxes} mode="contained" theme={{ roundness: 3 }} onPress={() => console.log(isSignedIn)}>
+        <MUIButton style={styles.boxes} mode="contained" theme={{ roundness: 3 }} onPress={() => navigation.navigate('NecessaryPapers', {type:'VerticalTransfer'})}>
           <Text style={styles.texts}>{"dgs başvuru".toLocaleUpperCase()}</Text>
         </MUIButton>
-        <MUIButton style={styles.boxes} mode="contained" theme={{ roundness: 3 }} onPress={() => console.log(isSignedIn)}>
+        <MUIButton style={styles.boxes} mode="contained" theme={{ roundness: 3 }} onPress={() => navigation.navigate('NecessaryPapers', {type:'HorizontalTransfer'})}>
           <Text style={styles.texts}>{"yatay geçiş başvuru".toLocaleUpperCase()}</Text>
         </MUIButton>
-        <MUIButton style={styles.boxes} mode="contained" theme={{ roundness: 3 }} onPress={() => console.log(isSignedIn)}>
+        <MUIButton style={styles.boxes} mode="contained" theme={{ roundness: 3 }} onPress={() => navigation.navigate('NecessaryPapers', {type:'SummerSchool'})}>
           <Text style={styles.texts}>{"yaz okulu başvuru".toLocaleUpperCase()}</Text>
         </MUIButton>
-        <MUIButton style={styles.boxes} mode="contained" theme={{ roundness: 3 }} onPress={() => console.log(isSignedIn)}>
+        <MUIButton style={styles.boxes} mode="contained" theme={{ roundness: 3 }} onPress={() => navigation.navigate('NecessaryPapers', {type:'ClassAdaptation'})}>
           <Text style={styles.texts}>{"ders intibak başvuru".toLocaleUpperCase()}</Text>
         </MUIButton>
       </ScrollView>

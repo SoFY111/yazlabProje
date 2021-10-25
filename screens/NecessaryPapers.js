@@ -1,9 +1,62 @@
-import React from "react";
+import React, { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Button } from "react-native-paper";
 import { Icon } from "react-native-elements";
 
-const DoubleMajorNecessaryPapers = () => {
+import uuid from 'react-native-uuid';
+
+import { useNavigation, useRoute } from "@react-navigation/core";
+
+import firestore from "@react-native-firebase/firestore";
+import auth from "@react-native-firebase/auth";
+
+const NecessaryPapers = (  ) => {
+
+  /*
+  *   DoubleMajor: ÇAP(0)
+  *   VerticalTransfer: DGS(1)
+  *   HorizontalTransfer: Yatay Geçiş(2)
+  *   SummerSchool: Yaz Okulu(3)
+  *   ClassAdaptation: Ders İntibak(4)
+  *
+  * */
+
+
+  const navigation = useNavigation();
+  const type = useRoute().params.type;
+
+  const clickNextButton = async () => {
+    const appealUUID = uuid.v4();
+    const [declareAppealType, setDeclareAppealType] = useState(0)
+    if(type == 'VerticalTransfer') setDeclareAppealType(1)
+    else if(type == 'HorizontalTransfer') setDeclareAppealType(2)
+    else if(type == 'SummerSchool') setDeclareAppealType(3)
+    else if(type == 'ClassAdaptation') setDeclareAppealType(4)
+    console.log('type:' + type)
+
+    const appealType = declareAppealType;
+    console.log('DappealType:' + declareAppealType)
+    console.log('appealType:' + appealType)
+
+     await firestore().collection('users')
+       .doc(auth().currentUser.uid)
+       .collection('appeals')
+       .doc(appealUUID).
+       set({
+         appealUUID,
+         appealType,
+         isStart:2,
+       }, {merge: true})
+
+      /* await firestore().collection('appeals').doc(auth().currentUser.uid).collection(appealUUID).doc(appealUUID).set({
+          appealUUID,
+          appealType: 0,
+          isStart: 1,
+      }
+    , {merge:true})*/
+
+  }
+
   return (
     <View style={{ flex: 1, padding: 16 }}>
       <View style={{ flex: 1 }}>
@@ -32,7 +85,7 @@ const DoubleMajorNecessaryPapers = () => {
 
       </View>
       <View>
-        <Button mode="contained">
+        <Button mode="contained" onPress={() => clickNextButton()}>
           <Text style={{ color: "#fff" }}>{"devam et".toLocaleUpperCase()}</Text>
         </Button>
       </View>
@@ -54,4 +107,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DoubleMajorNecessaryPapers;
+export default NecessaryPapers;

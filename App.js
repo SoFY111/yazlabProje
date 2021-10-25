@@ -19,7 +19,8 @@ import SignIn from "./screens/SignIn";
 import SignUp from "./screens/SignUp";
 import Profile from "./screens/Profile";
 import Applications from "./screens/Applications";
-import DoubleMajorNecessaryPapers from "./screens/DoubleMajorNecessaryPapers ";
+
+import NecessaryPapers from "./screens/NecessaryPapers";
 
 import { useSelector } from "react-redux";
 
@@ -55,7 +56,6 @@ const TabsNavigator = () => {
       <Tabs.Screen name="Başvurular" component={ApplicationStackScreen}
                    options={{ title: "BAŞVURULAR", headerTitleAlign: "center" }} />
       <Tabs.Screen name="Profil" component={ProfileStackScreen} />
-      {/*<Tabs.Screen name="DoubleMajorNecessaryPapers" component={DoubleMajorNecessaryPapers} />*/}
     </Tabs.Navigator>
   );
 };
@@ -66,7 +66,7 @@ const ApplicationStackScreen = () => {
     <ApplicationStack.Navigator>
       <ProfileStack.Screen name="Applications" component={Applications}
                            options={{ title: "BAŞVURULAR", headerTitleAlign: "center" }} />
-      <ProfileStack.Screen name="DoubleMajorNecessaryPapers" component={DoubleMajorNecessaryPapers} options={{title:'ÇAP Gerekli Evraklar', headerTitleAlign:'center'}}/>
+      <ProfileStack.Screen name="NecessaryPapers" component={NecessaryPapers} options={{title:'Gerekli Evraklar', headerTitleAlign:'center'}}/>
     </ApplicationStack.Navigator>
   );
 };

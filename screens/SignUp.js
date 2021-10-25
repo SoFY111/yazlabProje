@@ -48,8 +48,7 @@ const SignUp = () => {
         ogrSinif,
         faculty,
         departmant,
-        type:0,
-        created: firestore().Timestamp.now()
+        type: 0
       });
       setIsLoading(false);
       await auth().signInWithEmailAndPassword(email, password);
