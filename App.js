@@ -20,6 +20,9 @@ import SignUp from "./screens/SignUp";
 import Profile from "./screens/Profile";
 import Applications from "./screens/Applications";
 
+import DoubleMajorAppealFirstScreen from "./screens/appealScreens/DoubleMajorAppeal/DoubleMajorAppealFirstScreen";
+import VerticalAppealFirstScreen from "./screens/appealScreens/VerticalAppeal/VerticalAppealFirstScreen";
+
 import NecessaryPapers from "./screens/NecessaryPapers";
 
 import { useSelector } from "react-redux";
@@ -64,9 +67,11 @@ const ApplicationStack = createNativeStackNavigator();
 const ApplicationStackScreen = () => {
   return (
     <ApplicationStack.Navigator>
-      <ProfileStack.Screen name="Applications" component={Applications}
+      <ApplicationStack.Screen name="Applications" component={Applications}
                            options={{ title: "BAŞVURULAR", headerTitleAlign: "center" }} />
-      <ProfileStack.Screen name="NecessaryPapers" component={NecessaryPapers} options={{title:'Gerekli Evraklar', headerTitleAlign:'center'}}/>
+      <ApplicationStack.Screen name="NecessaryPapers" component={NecessaryPapers} options={{title:'Gerekli Evraklar', headerTitleAlign:'center'}}/>
+      <ApplicationStack.Screen name="DoubleMajorAppealFirstScreen" component={DoubleMajorAppealFirstScreen} options={{title:'Çap Başvuru', headerTitleAlign:'center'}}/>
+      <ApplicationStack.Screen name="VerticalAppealFirstScreen" component={VerticalAppealFirstScreen} options={{title:'Çap Başvuru', headerTitleAlign:'center'}}/>
     </ApplicationStack.Navigator>
   );
 };

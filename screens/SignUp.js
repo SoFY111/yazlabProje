@@ -55,7 +55,6 @@ const SignUp = () => {
       dispatch(userAuthChange())
     } catch (e) {
       setIsLoading(false);
-      console.warn(e.message);
       setError(e.message);
     }
   };
