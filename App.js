@@ -46,7 +46,7 @@ const TabsNavigator = () => {
   const navigation = useNavigation();
   useEffect(() => {
     auth().onAuthStateChanged(user => {
-      if (!user) navigation.navigate("SignIn");
+      //if (!user) navigation.navigate("SignIn");
     });
   }, []);
   return (

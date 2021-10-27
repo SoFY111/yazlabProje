@@ -46,7 +46,7 @@ const NecessaryPapers = () => {
         querySnapshot.docs.map(doc => {
           console.log('appealType: ' + doc.data()?.appealType + '\nisStart: ' + doc.data()?.isStart)
           if(doc.data()?.appealType === declareAppealType && doc.data()?.isStart === 2){
-            if(declareAppealType === 0) navigation.navigate('DoubleMajorAppealFirstScreen');
+            if(declareAppealType === 0) navigation.navigate('DoubleMajorAppealFirstScreen', {appealUUID: doc.data()?.appealUUID});
             else if(declareAppealType === 1) navigation.navigate('VerticalAppealFirstScreen');
           }
         })
