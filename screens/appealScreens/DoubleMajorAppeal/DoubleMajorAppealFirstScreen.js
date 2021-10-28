@@ -9,12 +9,15 @@ import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
 
 import { useRoute } from "@react-navigation/core";
-import RNFetchBlob from "rn-fetch-blob";
 import getPath from '@flyerhq/react-native-android-uri-path'
+import { Icon } from "react-native-elements";
 
 
 const DoubleMajorAppealFirstScreen = () => {
-  const [image, setImage] = useState([{ name: null, uri: null }]);
+  const [fileX, setFileX] = useState([{ name: null, uri: null }]);
+  const [fileY, setFileY] = useState([{ name: null, uri: null }]);
+  const [fileZ, setFileZ] = useState([{ name: null, uri: null }]);
+  const [fileQ, setFileQ] = useState([{ name: null, uri: null }]);
   const [userData, setUserData] = useState(null);
   const [appealUUID, setAppealUUID] = useState("");
   const appealUUIDroute = useRoute().params.appealUUID;
@@ -30,17 +33,12 @@ const DoubleMajorAppealFirstScreen = () => {
       });
   });
 
-  const getPathForFirebaseStorage = async (uri) => {
-    if (Platform.OS === "ios") {
-      return uri;
-    }
-    const stat = await RNFetchBlob.fs.stat(uri);
-    return stat.path;
-  };
 
-
-  const docPicker = async () => {
-    setImage([{}]);
+  const docPicker = async (type) => {
+    if(type === 'x') setFileY([{}]);
+    else if(type === 'y') setFileY([{}])
+    else if(type === 'z') setFileZ([{}])
+    else if(type === 'q') setFileQ([{}])
     // Pick a single file
     try {
       const res = await DocumentPicker.pick({
@@ -62,10 +60,18 @@ const DoubleMajorAppealFirstScreen = () => {
         type: [DocumentPicker.types.csv,DocumentPicker.types.xls]*/
         type: [DocumentPicker.types.allFiles],
       });
-      setImage([{
-        name: res[0].name,
-        uri: res[0].uri,
-      }]);
+
+      if(type === 'x') setFileX([{ name: res[0].name, uri: res[0].uri }]);
+      else if(type === 'y') setFileY([{ name: res[0].name, uri: res[0].uri }])
+      else if(type === 'z') setFileZ([{ name: res[0].name, uri: res[0].uri }])
+      else if(type === 'q') setFileQ([{ name: res[0].name, uri: res[0].uri }])
+
+
+      console.log('fileX: ' + fileX[0].name)
+      console.log('fileY: ' + fileY[0].name)
+      console.log('fileZ: ' + fileZ[0].name)
+      console.log('fileQ: ' + fileQ[0].name)
+
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
         console.log("error -----", err);
@@ -76,29 +82,56 @@ const DoubleMajorAppealFirstScreen = () => {
   };
 
 
-  const uploadFile = async () => {
-    let fileName = image[0].name;
-    const fileUri = getPath(image[0].uri);
+  const uploadFile = async (type) => {
 
+    let file;
+    const [fileType, setFileType] = useState('')
+
+    if(type === 'x') {
+      file = fileX[0];
+      // setFileType('fileX')
+    }
+    else if(type === 'y') {
+      file = fileY[0];
+      // setFileType('fileY')
+    }
+    else if(type === 'z') {
+      file = fileZ[0];
+      // setFileType('fileZ')
+    }
+    else if(type === 'q') {
+      file = fileQ[0];
+      // setFileType('fileQ')
+    }
+
+    console.log('type: ' + type)
+    console.log('fileType: ' + fileType)
+    console.log(file.name)
+
+    /*let fileName = file.name;
+    const fileUri = getPath(file.uri);
     const extension = fileName.split(".").pop();
     const name = fileName.split(".").slice(0, -1).join(".");
 
-    fileName = userData.studentNumber + "_" + auth().currentUser.displayName.replace(" ", "-") + "_" + Date.now() + "_" + appealUUID;
+    fileName = userData.studentNumber + "_"
+            + auth().currentUser.displayName.replace(" ", "-") + "_"
+            + Date.now() + "_"
+            + appealUUID + '_'
+            + fileType + '.'
+            + extension;
 
-    console.log("---------------");
-    console.log(image[0].uri);
-    console.log(fileUri);
+    let task;
 
-    const task = storage().ref('images/'+fileName).putFile(fileUri);
+    if(extension === 'pdf') task = storage().ref('pdf/'+fileName).putFile(fileUri);
+    else task = storage().ref('images/'+fileName).putFile(fileUri);*/
 
-    try {
+    /*try {
       await task;
     } catch (e) {
       console.log(e.message);
-    }
+    }*/
   };
 
-  const yourPDFURI = { uri: "bundle-assets://pdf/abc.pdf", cache: true };
   const [checked, setChecked] = useState(false);
 
   return (
@@ -216,31 +249,91 @@ const DoubleMajorAppealFirstScreen = () => {
         <View style={styles.content}>
           <View
             style={{
-              width: "30%",
-              justifyContent: "center",
+              flexDirection:"column",
+              justifyContent:'flex-start',
             }}
           >
-            <TouchableOpacity
-              onPress={() => docPicker()}
-            >
-              <Text> {"upload  doc"}</Text>
-            </TouchableOpacity>
-
+            <View key={0}>
+              <TouchableOpacity
+                style={{marginTop:6  ,paddingVertical: 8, paddingLeft:18, paddingRight:12 , borderWidth:1, borderColor: 'rgba(0,0,0,.3)', borderRadius:6}}
+                onPress={() => docPicker('x')}
+              >
+                {fileX[0].name ? fileX.map(({ name, uri }) => {
+                  return (
+                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent:"space-between"}}>
+                      <Text>{name}</Text>
+                      <TouchableOpacity style={{marginLeft:18}} onPress={() => setFileX([{name: null, uri: null}])}>
+                        <Icon name='close' type="ionicon" />
+                      </TouchableOpacity>
+                      <Button style={{marginLeft:4}} mode="contained" onPress={() => uploadFile('x')}><Text
+                        style={{ color: "#fff" }}>Yükle</Text></Button>
+                    </View>
+                  );
+                }) : <Text style={{paddingHorizontal: 64, paddingVertical:6}}>X Evrağı Yükle</Text>}
+              </TouchableOpacity>
+            </View>
+            <View key={1}>
+              <TouchableOpacity
+                style={{marginTop:6  ,paddingVertical: 8, paddingLeft:18, paddingRight:12 , borderWidth:1, borderColor: 'rgba(0,0,0,.3)', borderRadius:6}}
+                onPress={() => docPicker('y')}
+              >
+                {fileY[0].name ? fileY.map(({ name, uri }) => {
+                  return (
+                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent:"space-between"}}>
+                      <Text>{name}</Text>
+                      <TouchableOpacity style={{marginLeft:18}} onPress={() => setFileY([{name: null, uri: null}])}>
+                        <Icon name='close' type="ionicon" />
+                      </TouchableOpacity>
+                      <Button style={{marginLeft:4}} mode="contained" onPress={() => uploadFile('y')}><Text
+                        style={{ color: "#fff" }}>Yükle</Text></Button>
+                    </View>
+                  );
+                }) : <Text style={{paddingHorizontal: 64, paddingVertical:6}}>Y Evrağı Yükle</Text>}
+              </TouchableOpacity>
+            </View>
+            <View key={2}>
+              <TouchableOpacity
+                style={{marginTop:6  ,paddingVertical: 8, paddingLeft:18, paddingRight:12 , borderWidth:1, borderColor: 'rgba(0,0,0,.3)', borderRadius:6}}
+                onPress={() => docPicker('z')}
+              >
+                {fileZ[0].name ? fileZ.map(({ name, uri }) => {
+                  return (
+                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent:"space-between"}}>
+                      <Text>{name}</Text>
+                      <TouchableOpacity style={{marginLeft:18}} onPress={() => setFileZ([{name: null, uri: null}])}>
+                        <Icon name='close' type="ionicon" />
+                      </TouchableOpacity>
+                      <Button style={{marginLeft:4}} mode="contained" onPress={() => uploadFile('z')}><Text
+                        style={{ color: "#fff" }}>Yükle</Text></Button>
+                    </View>
+                  );
+                }) : <Text style={{paddingHorizontal: 64, paddingVertical:6}}>Z Evrağı Yükle</Text>}
+              </TouchableOpacity>
+            </View>
+            <View key={3}>
+              <TouchableOpacity
+                style={{marginTop:6  ,paddingVertical: 8, paddingLeft:18, paddingRight:12 , borderWidth:1, borderColor: 'rgba(0,0,0,.3)', borderRadius:6}}
+                onPress={() => docPicker('q')}
+              >
+                {fileQ[0].name ? fileQ.map(({ name, uri }) => {
+                  return (
+                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent:"space-between"}}>
+                      <Text>{name}</Text>
+                      <TouchableOpacity style={{marginLeft:18}} onPress={() => setFileQ([{name: null, uri: null}])}>
+                        <Icon name='close' type="ionicon" />
+                      </TouchableOpacity>
+                      <Button style={{marginLeft:4}} mode="contained" onPress={() => uploadFile('q')}><Text
+                        style={{ color: "#fff" }}>Yükle</Text></Button>
+                    </View>
+                  );
+                }) : <Text style={{paddingHorizontal: 64, paddingVertical:6}}>Q Evrağı Yükle</Text>}
+              </TouchableOpacity>
+            </View>
           </View>
-          {image.map(({ name, uri }) => {
-            return (
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <Text>{name}</Text>
-                <Button mode="contained" onPress={() => uploadFile()}><Text
-                  style={{ color: "#fff" }}>Yükle</Text></Button>
-              </View>
-            );
-          })}
         </View>
       </View>
       <View style={styles.nextButtonContainer}>
-
-        <Button mode="contained">
+        <Button mode="contained" onPress={() => console.log('pressed')}>
           <Text style={{ color: "#fff" }}>Devam</Text>
         </Button>
       </View>
@@ -268,11 +361,10 @@ const styles = StyleSheet.create({
     backgroundColor: "blue",
   },
   nextButtonContainer: {
-    flex: 1,
     alignItems: "flex-end",
     alignContent: "flex-end",
     justifyContent: "flex-end",
-    marginBottom: 12,
+    marginVertical: 12,
   },
 });
 
