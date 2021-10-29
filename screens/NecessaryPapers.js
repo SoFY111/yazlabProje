@@ -33,7 +33,7 @@ const NecessaryPapers = () => {
     else if (type == "SummerSchool") setDeclareAppealType(3);
     else if (type == "ClassAdaptation") setDeclareAppealType(4);
 
-  });
+  }, []);
 
   //Eğer yarım kalan bi başvuru varsa oraya yönlendir.
   useEffect( ()  => {
@@ -42,9 +42,7 @@ const NecessaryPapers = () => {
       .collection('appeals')
       .get()
       .then(querySnapshot => {
-        console.log(querySnapshot.docs.map(doc => doc.data()));
         querySnapshot.docs.map(doc => {
-          console.log('appealType: ' + doc.data()?.appealType + '\nisStart: ' + doc.data()?.isStart)
           if(doc.data()?.appealType === declareAppealType && doc.data()?.isStart === 2){
             if(declareAppealType === 0) navigation.navigate('DoubleMajorAppealFirstScreen', {appealUUID: doc.data()?.appealUUID});
             else if(declareAppealType === 1) navigation.navigate('VerticalAppealFirstScreen');

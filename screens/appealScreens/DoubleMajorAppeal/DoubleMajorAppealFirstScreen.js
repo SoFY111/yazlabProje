@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Button, Checkbox } from "react-native-paper";
 
 import DocumentPicker from "react-native-document-picker";
 
-import storage from "@react-native-firebase/storage";
+import storage from '@react-native-firebase/storage';
 import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
 
 import { useRoute } from "@react-navigation/core";
-import getPath from '@flyerhq/react-native-android-uri-path'
 import { Icon } from "react-native-elements";
+
+import getPath from "@flyerhq/react-native-android-uri-path";
 
 
 const DoubleMajorAppealFirstScreen = () => {
@@ -31,14 +32,23 @@ const DoubleMajorAppealFirstScreen = () => {
       .then(querySnapshot => {
         setUserData(querySnapshot.data());
       });
-  });
+
+    firestore().collection("users")
+      .doc(auth().currentUser.uid)
+      .collection('appeals')
+      .doc(appealUUID)
+      .get()
+      .then(querySnapshot => {
+        console.log(querySnapshot.data())
+      })
+  }, []);
 
 
   const docPicker = async (type) => {
-    if(type === 'x') setFileY([{}]);
-    else if(type === 'y') setFileY([{}])
-    else if(type === 'z') setFileZ([{}])
-    else if(type === 'q') setFileQ([{}])
+    if (type === "x") setFileY([{}]);
+    else if (type === "y") setFileY([{}]);
+    else if (type === "z") setFileZ([{}]);
+    else if (type === "q") setFileQ([{}]);
     // Pick a single file
     try {
       const res = await DocumentPicker.pick({
@@ -61,16 +71,16 @@ const DoubleMajorAppealFirstScreen = () => {
         type: [DocumentPicker.types.allFiles],
       });
 
-      if(type === 'x') setFileX([{ name: res[0].name, uri: res[0].uri }]);
-      else if(type === 'y') setFileY([{ name: res[0].name, uri: res[0].uri }])
-      else if(type === 'z') setFileZ([{ name: res[0].name, uri: res[0].uri }])
-      else if(type === 'q') setFileQ([{ name: res[0].name, uri: res[0].uri }])
+      if (type === "x") setFileX([{ name: res[0].name, uri: res[0].uri }]);
+      else if (type === "y") setFileY([{ name: res[0].name, uri: res[0].uri }]);
+      else if (type === "z") setFileZ([{ name: res[0].name, uri: res[0].uri }]);
+      else if (type === "q") setFileQ([{ name: res[0].name, uri: res[0].uri }]);
 
 
-      console.log('fileX: ' + fileX[0].name)
-      console.log('fileY: ' + fileY[0].name)
-      console.log('fileZ: ' + fileZ[0].name)
-      console.log('fileQ: ' + fileQ[0].name)
+      console.log("fileX: " + fileX[0].name);
+      console.log("fileY: " + fileY[0].name);
+      console.log("fileZ: " + fileZ[0].name);
+      console.log("fileQ: " + fileQ[0].name);
 
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
@@ -83,32 +93,14 @@ const DoubleMajorAppealFirstScreen = () => {
 
 
   const uploadFile = async (type) => {
+    let file
 
-    let file;
-    const [fileType, setFileType] = useState('')
+    if(type === 'x') file = fileX[0];
+    else if(type === 'y') file = fileY[0];
+    else if(type === 'z') file = fileZ[0];
+    else if(type === 'q') file = fileQ[0];
 
-    if(type === 'x') {
-      file = fileX[0];
-      // setFileType('fileX')
-    }
-    else if(type === 'y') {
-      file = fileY[0];
-      // setFileType('fileY')
-    }
-    else if(type === 'z') {
-      file = fileZ[0];
-      // setFileType('fileZ')
-    }
-    else if(type === 'q') {
-      file = fileQ[0];
-      // setFileType('fileQ')
-    }
-
-    console.log('type: ' + type)
-    console.log('fileType: ' + fileType)
-    console.log(file.name)
-
-    /*let fileName = file.name;
+    let fileName = file.name;
     const fileUri = getPath(file.uri);
     const extension = fileName.split(".").pop();
     const name = fileName.split(".").slice(0, -1).join(".");
@@ -117,19 +109,57 @@ const DoubleMajorAppealFirstScreen = () => {
             + auth().currentUser.displayName.replace(" ", "-") + "_"
             + Date.now() + "_"
             + appealUUID + '_'
-            + fileType + '.'
+            + 'file' + type.toUpperCase() + '.'
             + extension;
+
 
     let task;
 
-    if(extension === 'pdf') task = storage().ref('pdf/'+fileName).putFile(fileUri);
-    else task = storage().ref('images/'+fileName).putFile(fileUri);*/
+    if(extension === 'pdf') task = storage().ref('pdf/'+ appealUUID + '/' + fileName).putFile(fileUri);
+    else task = storage().ref('images/'+ appealUUID + '/' + fileName).putFile(fileUri);
 
-    /*try {
+
+    try {
       await task;
+      if(type === 'x') await firestore().collection("users")
+        .doc(auth().currentUser.uid)
+        .collection('appeals')
+        .doc(appealUUID)
+        .set({
+          files: {
+            fileX: fileName
+          }
+        }, {merge: true})
+      else if(type === 'y') await firestore().collection("users")
+        .doc(auth().currentUser.uid)
+        .collection('appeals')
+        .doc(appealUUID)
+        .set({
+          files: {
+            fileY: fileName
+          }
+        }, {merge: true})
+      else if(type === 'z') await firestore().collection("users")
+        .doc(auth().currentUser.uid)
+        .collection('appeals')
+        .doc(appealUUID)
+        .set({
+          files: {
+            fileZ: fileName
+          }
+        }, {merge: true})
+      else if(type === 'q') await firestore().collection("users")
+        .doc(auth().currentUser.uid)
+        .collection('appeals')
+        .doc(appealUUID)
+        .set({
+          files: {
+            fileQ: fileName
+          }
+        }, {merge: true})
     } catch (e) {
       console.log(e.message);
-    }*/
+    }
   };
 
   const [checked, setChecked] = useState(false);
@@ -249,91 +279,127 @@ const DoubleMajorAppealFirstScreen = () => {
         <View style={styles.content}>
           <View
             style={{
-              flexDirection:"column",
-              justifyContent:'flex-start',
+              flexDirection: "column",
+              justifyContent: "flex-start",
             }}
           >
             <View key={0}>
               <TouchableOpacity
-                style={{marginTop:6  ,paddingVertical: 8, paddingLeft:18, paddingRight:12 , borderWidth:1, borderColor: 'rgba(0,0,0,.3)', borderRadius:6}}
-                onPress={() => docPicker('x')}
+                style={{
+                  marginTop: 6,
+                  paddingVertical: 8,
+                  paddingLeft: 18,
+                  paddingRight: 12,
+                  borderWidth: 1,
+                  borderColor: "rgba(0,0,0,.3)",
+                  borderRadius: 6,
+                }}
+                onPress={() => docPicker("x")}
               >
                 {fileX[0].name ? fileX.map(({ name, uri }) => {
                   return (
-                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent:"space-between"}}>
+                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                       <Text>{name}</Text>
-                      <TouchableOpacity style={{marginLeft:18}} onPress={() => setFileX([{name: null, uri: null}])}>
-                        <Icon name='close' type="ionicon" />
+                      <TouchableOpacity style={{ marginLeft: 18 }}
+                                        onPress={() => setFileX([{ name: null, uri: null }])}>
+                        <Icon name="close" type="ionicon" />
                       </TouchableOpacity>
-                      <Button style={{marginLeft:4}} mode="contained" onPress={() => uploadFile('x')}><Text
+                      <Button style={{ marginLeft: 4 }} mode="contained" onPress={async () => await uploadFile("x")}><Text
                         style={{ color: "#fff" }}>Yükle</Text></Button>
                     </View>
                   );
-                }) : <Text style={{paddingHorizontal: 64, paddingVertical:6}}>X Evrağı Yükle</Text>}
+                }) : <Text style={{ paddingHorizontal: 64, paddingVertical: 6 }}>X Evrağı Yükle</Text>}
               </TouchableOpacity>
             </View>
             <View key={1}>
               <TouchableOpacity
-                style={{marginTop:6  ,paddingVertical: 8, paddingLeft:18, paddingRight:12 , borderWidth:1, borderColor: 'rgba(0,0,0,.3)', borderRadius:6}}
-                onPress={() => docPicker('y')}
+                style={{
+                  marginTop: 6,
+                  paddingVertical: 8,
+                  paddingLeft: 18,
+                  paddingRight: 12,
+                  borderWidth: 1,
+                  borderColor: "rgba(0,0,0,.3)",
+                  borderRadius: 6,
+                }}
+                onPress={() => docPicker("y")}
               >
                 {fileY[0].name ? fileY.map(({ name, uri }) => {
                   return (
-                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent:"space-between"}}>
+                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                       <Text>{name}</Text>
-                      <TouchableOpacity style={{marginLeft:18}} onPress={() => setFileY([{name: null, uri: null}])}>
-                        <Icon name='close' type="ionicon" />
+                      <TouchableOpacity style={{ marginLeft: 18 }}
+                                        onPress={() => setFileY([{ name: null, uri: null }])}>
+                        <Icon name="close" type="ionicon" />
                       </TouchableOpacity>
-                      <Button style={{marginLeft:4}} mode="contained" onPress={() => uploadFile('y')}><Text
+                      <Button style={{ marginLeft: 4 }} mode="contained" onPress={async () => await uploadFile("y")}><Text
                         style={{ color: "#fff" }}>Yükle</Text></Button>
                     </View>
                   );
-                }) : <Text style={{paddingHorizontal: 64, paddingVertical:6}}>Y Evrağı Yükle</Text>}
+                }) : <Text style={{ paddingHorizontal: 64, paddingVertical: 6 }}>Y Evrağı Yükle</Text>}
               </TouchableOpacity>
             </View>
             <View key={2}>
               <TouchableOpacity
-                style={{marginTop:6  ,paddingVertical: 8, paddingLeft:18, paddingRight:12 , borderWidth:1, borderColor: 'rgba(0,0,0,.3)', borderRadius:6}}
-                onPress={() => docPicker('z')}
+                style={{
+                  marginTop: 6,
+                  paddingVertical: 8,
+                  paddingLeft: 18,
+                  paddingRight: 12,
+                  borderWidth: 1,
+                  borderColor: "rgba(0,0,0,.3)",
+                  borderRadius: 6,
+                }}
+                onPress={() => docPicker("z")}
               >
                 {fileZ[0].name ? fileZ.map(({ name, uri }) => {
                   return (
-                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent:"space-between"}}>
+                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                       <Text>{name}</Text>
-                      <TouchableOpacity style={{marginLeft:18}} onPress={() => setFileZ([{name: null, uri: null}])}>
-                        <Icon name='close' type="ionicon" />
+                      <TouchableOpacity style={{ marginLeft: 18 }}
+                                        onPress={() => setFileZ([{ name: null, uri: null }])}>
+                        <Icon name="close" type="ionicon" />
                       </TouchableOpacity>
-                      <Button style={{marginLeft:4}} mode="contained" onPress={() => uploadFile('z')}><Text
+                      <Button style={{ marginLeft: 4 }} mode="contained" onPress={async () => await uploadFile("z")}><Text
                         style={{ color: "#fff" }}>Yükle</Text></Button>
                     </View>
                   );
-                }) : <Text style={{paddingHorizontal: 64, paddingVertical:6}}>Z Evrağı Yükle</Text>}
+                }) : <Text style={{ paddingHorizontal: 64, paddingVertical: 6 }}>Z Evrağı Yükle</Text>}
               </TouchableOpacity>
             </View>
             <View key={3}>
               <TouchableOpacity
-                style={{marginTop:6  ,paddingVertical: 8, paddingLeft:18, paddingRight:12 , borderWidth:1, borderColor: 'rgba(0,0,0,.3)', borderRadius:6}}
-                onPress={() => docPicker('q')}
+                style={{
+                  marginTop: 6,
+                  paddingVertical: 8,
+                  paddingLeft: 18,
+                  paddingRight: 12,
+                  borderWidth: 1,
+                  borderColor: "rgba(0,0,0,.3)",
+                  borderRadius: 6,
+                }}
+                onPress={() => docPicker("q")}
               >
                 {fileQ[0].name ? fileQ.map(({ name, uri }) => {
                   return (
-                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent:"space-between"}}>
+                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                       <Text>{name}</Text>
-                      <TouchableOpacity style={{marginLeft:18}} onPress={() => setFileQ([{name: null, uri: null}])}>
-                        <Icon name='close' type="ionicon" />
+                      <TouchableOpacity style={{ marginLeft: 18 }}
+                                        onPress={() => setFileQ([{ name: null, uri: null }])}>
+                        <Icon name="close" type="ionicon" />
                       </TouchableOpacity>
-                      <Button style={{marginLeft:4}} mode="contained" onPress={() => uploadFile('q')}><Text
+                      <Button style={{ marginLeft: 4 }} mode="contained" onPress={async () => await uploadFile("q")}><Text
                         style={{ color: "#fff" }}>Yükle</Text></Button>
                     </View>
                   );
-                }) : <Text style={{paddingHorizontal: 64, paddingVertical:6}}>Q Evrağı Yükle</Text>}
+                }) : <Text style={{ paddingHorizontal: 64, paddingVertical: 6 }}>Q Evrağı Yükle</Text>}
               </TouchableOpacity>
             </View>
           </View>
         </View>
       </View>
       <View style={styles.nextButtonContainer}>
-        <Button mode="contained" onPress={() => console.log('pressed')}>
+        <Button mode="contained" onPress={() => console.log("pressed")}>
           <Text style={{ color: "#fff" }}>Devam</Text>
         </Button>
       </View>
