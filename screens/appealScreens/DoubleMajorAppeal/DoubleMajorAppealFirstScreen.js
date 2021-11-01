@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { Button, Checkbox } from "react-native-paper";
+import { Button, Checkbox, Dialog, Portal } from "react-native-paper";
 
 import DocumentPicker from "react-native-document-picker";
 
-import storage from '@react-native-firebase/storage';
+import storage from "@react-native-firebase/storage";
 import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
 
-import { useRoute } from "@react-navigation/core";
+import { useNavigation, useRoute } from "@react-navigation/core";
 import { Icon } from "react-native-elements";
 
 import getPath from "@flyerhq/react-native-android-uri-path";
@@ -19,17 +19,28 @@ const DoubleMajorAppealFirstScreen = () => {
   const [fileY, setFileY] = useState([{ name: null, uri: null }]);
   const [fileZ, setFileZ] = useState([{ name: null, uri: null }]);
   const [fileQ, setFileQ] = useState([{ name: null, uri: null }]);
+  const [fileF, setFileF] = useState([{ name: null, uri: null }]);
   const [isUploadedFileX, setIsUploadedFileX] = useState([{ name: null, uri: null }]);
   const [isUploadedFileY, setIsUploadedFileY] = useState([{ name: null, uri: null }]);
   const [isUploadedFileZ, setIsUploadedFileZ] = useState([{ name: null, uri: null }]);
   const [isUploadedFileQ, setIsUploadedFileQ] = useState([{ name: null, uri: null }]);
-  const [fileUploadedLoader, setFileUploadedLoader] = useState(false)
+  const [isUploadedFileF, setIsUploadedFileF] = useState([{ name: null, uri: null }]);
+  const [fileUploadedLoader, setFileUploadedLoader] = useState(false);
+  const [isDialogVisible, setIsDialogVisible] = useState(false);
+  const [fileXisLoading, setFileXisLoading] = useState(false);
+  const [fileYisLoading, setFileYisLoading] = useState(false);
+  const [fileZisLoading, setFileZisLoading] = useState(false);
+  const [fileQisLoading, setFileQisLoading] = useState(false);
+  const [fileFisLoading, setFileFisLoading] = useState(false);
+
+  const [checked, setChecked] = useState(false);
+  const [lastAcceptTermsAndConditions, setLastAcceptTermsAndConditions] = useState(false);
+  const [percentCounter, setPercentCounter] = useState(0);
   const [userData, setUserData] = useState(null);
   const [appealUUID, setAppealUUID] = useState(useRoute().params.appealUUID);
-  const appealUUIDroute = useRoute().params.appealUUID;
+  const navigation = useNavigation()
 
   useEffect(() => {
-    setAppealUUID(appealUUIDroute);
 
     firestore().collection("users")
       .doc(auth().currentUser.uid)
@@ -40,36 +51,42 @@ const DoubleMajorAppealFirstScreen = () => {
   }, []);
 
   useEffect(() => {
-    console.log('uid:' + auth().currentUser.uid)
-    console.log('appeal: '+ appealUUID)
     firestore().collection("users")
       .doc(auth().currentUser.uid)
-      .collection('appeals')
+      .collection("appeals")
       .doc(appealUUID)
       .get()
       .then(querySnapshot => {
-        console.log(querySnapshot.data()?.appealUUID)
-        if(querySnapshot.exists){
-          if(querySnapshot.data()?.files.fileX) {
+        console.log(querySnapshot.data()?.appealUUID);
+        if (querySnapshot.exists) {
+          if (querySnapshot.data()?.files.fileX) {
+            setPercentCounter(percentCounter + 1);
             setFileX([{ name: querySnapshot.data()?.files?.fileX }]);
-            setIsUploadedFileX([{name: querySnapshot.data()?.files?.fileX }])
+            setIsUploadedFileX([{ name: querySnapshot.data()?.files?.fileX }]);
           }
-          if(querySnapshot.data()?.files.fileY) {
+          if (querySnapshot.data()?.files.fileY) {
+            setPercentCounter(percentCounter + 1);
             setFileY([{ name: querySnapshot.data()?.files?.fileY }]);
-            setIsUploadedFileY([{name: querySnapshot.data()?.files?.fileY }])
+            setIsUploadedFileY([{ name: querySnapshot.data()?.files?.fileY }]);
           }
-          if(querySnapshot.data()?.files.fileZ) {
+          if (querySnapshot.data()?.files.fileZ) {
+            setPercentCounter(percentCounter + 1);
             setFileZ([{ name: querySnapshot.data()?.files?.fileZ }]);
-            setIsUploadedFileZ([{name: querySnapshot.data()?.files?.fileZ }])
+            setIsUploadedFileZ([{ name: querySnapshot.data()?.files?.fileZ }]);
           }
-          if(querySnapshot.data()?.files.fileQ) {
+          if (querySnapshot.data()?.files.fileQ) {
+            setPercentCounter(percentCounter + 1);
             setFileQ([{ name: querySnapshot.data()?.files?.fileQ }]);
-            setIsUploadedFileQ([{name: querySnapshot.data()?.files?.fileQ }])
+            setIsUploadedFileQ([{ name: querySnapshot.data()?.files?.fileQ }]);
+          }
+          if (querySnapshot.data()?.files.fileF) {
+            setPercentCounter(percentCounter + 1);
+            setFileF([{ name: querySnapshot.data()?.files?.fileF }]);
+            setIsUploadedFileF([{ name: querySnapshot.data()?.files?.fileF }]);
           }
         }
-
-      })
-  }, [])
+      });
+  }, []);
 
 
   const docPicker = async (type) => {
@@ -77,6 +94,8 @@ const DoubleMajorAppealFirstScreen = () => {
     else if (type === "y") setFileY([{}]);
     else if (type === "z") setFileZ([{}]);
     else if (type === "q") setFileQ([{}]);
+    else if (type === "f") setFileF([{}]);
+
     // Pick a single file
     try {
       const res = await DocumentPicker.pick({
@@ -103,12 +122,7 @@ const DoubleMajorAppealFirstScreen = () => {
       else if (type === "y") setFileY([{ name: res[0].name, uri: res[0].uri }]);
       else if (type === "z") setFileZ([{ name: res[0].name, uri: res[0].uri }]);
       else if (type === "q") setFileQ([{ name: res[0].name, uri: res[0].uri }]);
-
-
-      console.log("fileX: " + fileX[0].name);
-      console.log("fileY: " + fileY[0].name);
-      console.log("fileZ: " + fileZ[0].name);
-      console.log("fileQ: " + fileQ[0].name);
+      else if (type === "f") setFileF([{ name: res[0].name, uri: res[0].uri }]);
 
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
@@ -120,12 +134,13 @@ const DoubleMajorAppealFirstScreen = () => {
   };
 
   const uploadFile = async (type) => {
-    let file
+    let file;
 
-    if(type === 'x') file = fileX[0];
-    else if(type === 'y') file = fileY[0];
-    else if(type === 'z') file = fileZ[0];
-    else if(type === 'q') file = fileQ[0];
+    if (type === "x") file = fileX[0];
+    else if (type === "y") file = fileY[0];
+    else if (type === "z") file = fileZ[0];
+    else if (type === "q") file = fileQ[0];
+    else if (type === "f") file = fileF[0];
 
     let fileName = file.name;
     const fileUri = getPath(file.uri);
@@ -133,86 +148,115 @@ const DoubleMajorAppealFirstScreen = () => {
     const name = fileName.split(".").slice(0, -1).join(".");
 
     fileName = userData.studentNumber + "_"
-            + auth().currentUser.displayName.replace(" ", "-") + "_"
-            + Date.now() + "_"
-            + appealUUID + '_'
-            + 'file' + type.toUpperCase() + '.'
-            + extension;
+      + auth().currentUser.displayName.replace(" ", "-") + "_"
+      + Date.now() + "_"
+      + appealUUID + "_"
+      + "file" + type.toUpperCase() + "."
+      + extension;
 
 
     let task;
 
-    if(extension === 'pdf') task = storage().ref('pdf/'+ appealUUID + '/' + fileName).putFile(fileUri);
-    else if(extension === 'jpg' || extension === 'jpeg' ||extension === 'png') task = storage().ref('images/'+ appealUUID + '/' + fileName).putFile(fileUri);
-    else task = storage().ref('documents/'+ appealUUID + '/' + fileName).putFile(fileUri);
+    if (extension === "pdf") task = storage().ref("pdf/" + appealUUID + "/" + fileName).putFile(fileUri);
+    else if (extension === "jpg" || extension === "jpeg" || extension === "png") task = storage().ref("images/" + appealUUID + "/" + fileName).putFile(fileUri);
+    else task = storage().ref("documents/" + appealUUID + "/" + fileName).putFile(fileUri);
 
 
     try {
       await task;
-      if(type === 'x') await firestore().collection("users")
+      if (type === "x") await firestore().collection("users")
         .doc(auth().currentUser.uid)
-        .collection('appeals')
+        .collection("appeals")
+        .doc(appealUUID)
+        .set({
+          percent: (percentCounter+1)/4*100,
+          files: {
+            fileX: fileName,
+          },
+        }, { merge: true }).then(() => {
+          setPercentCounter(percentCounter + 1)
+          setFileXisLoading(false)
+          setFileX([{ name: fileName, uri: null }]);
+          setIsUploadedFileX([{ name: fileName }]);
+          setFileUploadedLoader(true);
+          setTimeout(() => {
+            setFileUploadedLoader(false);
+          }, 2000);
+        });
+      else if (type === "y") await firestore().collection("users")
+        .doc(auth().currentUser.uid)
+        .collection("appeals")
+        .doc(appealUUID)
+        .set({
+          percent: (percentCounter+1)/4*100,
+          files: {
+            fileY: fileName,
+          },
+        }, { merge: true }).then(() => {
+          setPercentCounter(percentCounter + 1)
+          setFileYisLoading(false)
+          setFileY([{ name: fileName, uri: null }]);
+          setIsUploadedFileY([{ name: fileName }]);
+          setFileUploadedLoader(true);
+          setTimeout(() => {
+            setFileUploadedLoader(false);
+          }, 2000);
+        });
+      else if (type === "z") await firestore().collection("users")
+        .doc(auth().currentUser.uid)
+        .collection("appeals")
+        .doc(appealUUID)
+        .set({
+          percent: (percentCounter+1)/4*100,
+          files: {
+            fileZ: fileName,
+          },
+        }, { merge: true }).then(() => {
+          setPercentCounter(percentCounter + 1)
+          setFileZisLoading(false)
+          setFileZ([{ name: fileName, uri: null }]);
+          setIsUploadedFileZ([{ name: fileName }]);
+          setFileUploadedLoader(true);
+          setTimeout(() => {
+            setFileUploadedLoader(false);
+          }, 2000);
+        });
+      else if (type === "q") await firestore().collection("users")
+        .doc(auth().currentUser.uid)
+        .collection("appeals")
+        .doc(appealUUID)
+        .set({
+          percent: ((percentCounter+1)/4*100),
+          files: {
+            fileQ: fileName,
+          },
+        }, { merge: true }).then(() => {
+          setPercentCounter(percentCounter + 1)
+          setFileQisLoading(false)
+          setFileQ([{ name: fileName, uri: null }]);
+          setIsUploadedFileQ([{ name: fileName }]);
+          setFileUploadedLoader(true);
+          setTimeout(() => {
+            setFileUploadedLoader(false);
+          }, 2000);
+        });
+      else if (type === "f") await firestore().collection("users")
+        .doc(auth().currentUser.uid)
+        .collection("appeals")
         .doc(appealUUID)
         .set({
           files: {
-            fileX: fileName
-          }
-        }, {merge: true}).then(() => {
-          setFileX([{name: fileName, uri: null}])
-          setIsUploadedFileX([{name: fileName}])
+            fileF: fileName,
+          },
+        }, { merge: true }).then(() => {
+          setFileFisLoading(false)
+          setFileF([{ name: fileName, uri: null }]);
+          setIsUploadedFileQ([{ name: fileName }]);
           setFileUploadedLoader(true);
-          setTimeout( () => {
-            setFileUploadedLoader(false)
-          }, 2000)
-        })
-      else if(type === 'y') await firestore().collection("users")
-        .doc(auth().currentUser.uid)
-        .collection('appeals')
-        .doc(appealUUID)
-        .set({
-          files: {
-            fileY: fileName
-          }
-        }, {merge: true}).then(() => {
-          setFileY([{name: fileName, uri: null}])
-          setIsUploadedFileY([{name: fileName}])
-          setFileUploadedLoader(true);
-          setTimeout( () => {
-            setFileUploadedLoader(false)
-          }, 2000)
-        })
-      else if(type === 'z') await firestore().collection("users")
-        .doc(auth().currentUser.uid)
-        .collection('appeals')
-        .doc(appealUUID)
-        .set({
-          files: {
-            fileZ: fileName
-          }
-        }, {merge: true}).then(() => {
-          setFileZ([{name: fileName, uri: null}])
-          setIsUploadedFileZ([{name: fileName}])
-          setFileUploadedLoader(true);
-          setTimeout( () => {
-            setFileUploadedLoader(false)
-          }, 2000)
-        })
-      else if(type === 'q') await firestore().collection("users")
-        .doc(auth().currentUser.uid)
-        .collection('appeals')
-        .doc(appealUUID)
-        .set({
-          files: {
-            fileQ: fileName
-          }
-        }, {merge: true}).then(() => {
-          setFileQ([{name: fileName, uri: null}])
-          setIsUploadedFileQ([{name: fileName}])
-          setFileUploadedLoader(true);
-          setTimeout( () => {
-            setFileUploadedLoader(false)
-          }, 2000)
-        })
+          setTimeout(() => {
+            setFileUploadedLoader(false);
+          }, 2000);
+        });
     } catch (e) {
       console.log(e.message);
     }
@@ -222,179 +266,323 @@ const DoubleMajorAppealFirstScreen = () => {
 
     const extension = fileName.split(".").pop();
     let fileExtensionPath;
-    if(extension === 'pdf') fileExtensionPath = 'pdf'
-    else if(extension === 'jpg' || extension === 'jpeg' ||extension === 'png') fileExtensionPath = 'images'
-    else fileExtensionPath = 'documents';
+    if (extension === "pdf") fileExtensionPath = "pdf";
+    else if (extension === "jpg" || extension === "jpeg" || extension === "png") fileExtensionPath = "images";
+    else fileExtensionPath = "documents";
 
-    try{
-      console.log(fileExtensionPath + '/' + appealUUID + '/' + fileName)
-      await storage().ref(fileExtensionPath + '/' + appealUUID + '/' + fileName).delete()
+    try {
+      console.log(fileExtensionPath + "/" + appealUUID + "/" + fileName);
+      await storage().ref(fileExtensionPath + "/" + appealUUID + "/" + fileName).delete()
         .then(() => {
-          if(type === 'x') {
-            firestore().collection('users')
-              .doc(auth().currentUser.uid)
-              .collection('appeals')
-              .doc(appealUUID)
-              .set({
-                files:{
-                  fileX: null
-                }
-              }, {merge: true}).then(() => {
-              setFileX([{ name: null, uri: null }]);
-              setIsUploadedFileX([{name: null}])
-            })
-          }
-          else if(type === 'y') {
-            firestore().collection('users')
-              .doc(auth().currentUser.uid)
-              .collection('appeals')
-              .doc(appealUUID)
-              .set({
-                files:{
-                  fileY: null
-                }
-              }, {merge: true}).then(() => {
-              setFileY([{ name: null, uri: null }]);
-              setIsUploadedFileY([{name: null}])
-            })
-          }
-          else if(type === 'z') {
-            firestore().collection('users')
-              .doc(auth().currentUser.uid)
-              .collection('appeals')
-              .doc(appealUUID)
-              .set({
-                files:{
-                  fileZ: null
-                }
-              }, {merge: true}).then(() => {
-              setFileZ([{ name: null, uri: null }]);
-              setIsUploadedFileZ([{name: null}])
-            })
-          }
-          else if(type === 'q') {
-            firestore().collection('users')
-              .doc(auth().currentUser.uid)
-              .collection('appeals')
-              .doc(appealUUID)
-              .set({
-                files:{
-                  fileQ: null
-                }
-              }, {merge: true}).then(() => {
-              setFileQ([{ name: null, uri: null }]);
-              setIsUploadedFileQ([{name: null}])
-            })
-          }
-        }
-      )
-    }catch(e){
+            if (type === "x") {
+              firestore().collection("users")
+                .doc(auth().currentUser.uid)
+                .collection("appeals")
+                .doc(appealUUID)
+                .set({
+                  percent: (percentCounter - 1)/4*100,
+                  files: {
+                    fileX: null,
+                  },
+                }, { merge: true }).then(() => {
+                setPercentCounter(percentCounter - 1);
+                setFileX([{ name: null, uri: null }]);
+                setIsUploadedFileX([{ name: null }]);
+              });
+            } else if (type === "y") {
+              firestore().collection("users")
+                .doc(auth().currentUser.uid)
+                .collection("appeals")
+                .doc(appealUUID)
+                .set({
+                  percent: (percentCounter - 1)/4*100,
+                  files: {
+                    fileY: null,
+                  },
+                }, { merge: true }).then(() => {
+                setPercentCounter(percentCounter - 1);
+                setFileY([{ name: null, uri: null }]);
+                setIsUploadedFileY([{ name: null }]);
+              });
+            } else if (type === "z") {
+              firestore().collection("users")
+                .doc(auth().currentUser.uid)
+                .collection("appeals")
+                .doc(appealUUID)
+                .set({
+                  percent: (percentCounter - 1)/4*100,
+                  files: {
+                    fileZ: null,
+                  },
+                }, { merge: true }).then(() => {
+                setPercentCounter(percentCounter - 1);
+                setFileZ([{ name: null, uri: null }]);
+                setIsUploadedFileZ([{ name: null }]);
+              });
+            } else if (type === "q") {
+              firestore().collection("users")
+                .doc(auth().currentUser.uid)
+                .collection("appeals")
+                .doc(appealUUID)
+                .set({
+                  percent: (percentCounter - 1)/4*100,
+                  files: {
+                    fileQ: null,
+                  },
+                }, { merge: true }).then(() => {
+                setPercentCounter(percentCounter - 1);
+                setFileQ([{ name: null, uri: null }]);
+                setIsUploadedFileQ([{ name: null }]);
+              });
+            } else if (type === "f") {
+              firestore().collection("users")
+                .doc(auth().currentUser.uid)
+                .collection("appeals")
+                .doc(appealUUID)
+                .set({
+                  files: {
+                    fileF: null,
+                  },
+                }, { merge: true }).then(() => {
+                setFileF([{ name: null, uri: null }]);
+                setIsUploadedFileQ([{ name: null }]);
+              });
+            }
+          },
+        );
+    } catch (e) {
+      console.log(e.message);
+    } finally {
+      if (type === "x") setFileX([{ name: null, uri: null }]);
+      else if (type === "y") setFileY([{ name: null, uri: null }]);
+      else if (type === "z") setFileZ([{ name: null, uri: null }]);
+      else if (type === "q") setFileQ([{ name: null, uri: null }]);
+      else if (type === "f") setFileF([{ name: null, uri: null }]);
+    }
+  };
+
+  const finishAppeal = async () => {
+    try {
+      await firestore().collection('users')
+        .doc(auth().currentUser.uid)
+        .collection('appeals')
+        .doc(appealUUID)
+        .set({
+          isStart: 1,
+          percent: 100
+        }, {merge: true})
+    }
+    catch (e) {
       console.log(e.message)
     }
+    navigation.navigate('Applications')
   }
-
-  const [checked, setChecked] = useState(false);
 
   return (
     <View style={styles.container}>
       <ScrollView style={styles.scv}>
         <Text>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse in ante id nisi efficitur scelerisque in
-          sit amet tortor. Quisque eget faucibus velit. Phasellus est nisl, convallis quis lorem eu, malesuada
-          sollicitudin velit. Suspendisse potenti. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam rutrum
-          lorem eu elit consectetur, ac feugiat turpis auctor. Proin congue lectus sem, eget vehicula orci ornare vel.
-          Proin varius lectus sem, vitae fringilla risus dictum maximus. Curabitur dui diam, pretium sed neque nec,
-          venenatis ullamcorper nulla. Nullam ut tortor venenatis, molestie erat eget, hendrerit nulla. Pellentesque
-          rutrum dapibus tortor, quis elementum nulla iaculis nec. Quisque vel vehicula mi. Curabitur sit amet velit
-          porta, ornare mi at, convallis sem. Suspendisse velit ex, pharetra placerat pharetra id, mattis laoreet lorem.
-          Ut ornare augue in elit volutpat, in commodo nulla viverra. Nulla non fermentum diam, eu ultrices ipsum.
-          Duis mollis mauris rhoncus dapibus semper. Donec nec augue at sapien aliquam accumsan. Ut eros purus, vehicula
-          ut ipsum a, interdum imperdiet nulla. Duis non sem id sem fermentum porttitor. Aenean purus diam, cursus sed
-          pulvinar ut, consequat sed ante. Curabitur velit lectus, pellentesque ut consequat non, accumsan a dui.
-          Praesent mattis metus at risus ultrices suscipit. Nulla sit amet ex vel eros porta consectetur commodo nec
-          nulla. Donec nulla erat, tincidunt vel neque eu, gravida faucibus felis. Suspendisse scelerisque risus mauris,
-          auctor suscipit magna dapibus id. Vestibulum id condimentum nulla. Ut lobortis lacus enim, et molestie lorem
-          consectetur non. Mauris non tempor tellus. Ut efficitur hendrerit enim, sit amet tincidunt ipsum placerat ut.
-          Aliquam molestie ac leo convallis convallis. Donec vestibulum, sem ut pellentesque cursus, libero turpis
-          egestas nibh, eget tincidunt lectus sem in tellus. Nullam vitae tortor tortor. Maecenas ante turpis, fringilla
-          vel lacinia in, iaculis ut ex. Maecenas mollis erat at dictum euismod. Etiam in purus nec urna porttitor
-          fringilla et eget felis. Nullam lacus mi, condimentum molestie felis at, fringilla aliquet est. Sed vitae
-          tincidunt urna, mattis dapibus odio. Vestibulum dictum accumsan nisl non gravida. Aliquam mi leo, viverra ac
-          magna eget, scelerisque tempus nulla. Nam malesuada faucibus augue, a lobortis nibh molestie eu. Curabitur
-          dapibus orci sed nibh sollicitudin, non lobortis tellus sollicitudin. Aenean a turpis ac nisi mollis ultrices.
-          Vivamus venenatis ultricies tincidunt. Donec volutpat metus vitae erat porttitor fringilla. Etiam posuere dui
-          vel diam gravida pulvinar.
-          Aliquam in nunc hendrerit, gravida urna sed, ullamcorper nulla. Quisque eu malesuada metus. Class aptent
-          taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Duis non finibus dui, et
-          vestibulum odio. Fusce sed condimentum est, ut semper est. Aenean at magna libero. Pellentesque porttitor
-          fermentum dui, vel tristique purus fermentum et. Pellentesque sodales est et quam euismod mollis. Pellentesque
-          sed nunc lacus. Cras elit magna, placerat nec sem id, tristique aliquet quam.
-          Vestibulum egestas auctor urna in dapibus. Fusce neque ligula, mollis vitae rutrum eget, facilisis eu diam.
-          Aliquam ligula ipsum, feugiat sit amet magna vitae, aliquet iaculis orci. Aliquam erat volutpat. Suspendisse
-          eu ante augue. Curabitur volutpat lorem in viverra cursus. Sed convallis ultricies sapien, vitae dapibus ex
-          ultricies ac.
-          Pellentesque diam dui, finibus at purus sed, bibendum ultricies eros. Integer tempus sed metus eu consectetur.
-          Ut dapibus sapien pharetra erat aliquam hendrerit. Duis maximus suscipit turpis. Duis eget bibendum urna.
-          Praesent lobortis congue justo, ac varius urna gravida quis. Vestibulum a aliquam ligula. Morbi faucibus
-          consequat libero. Proin orci ipsum, ultricies sit amet ornare a, tristique non felis. Suspendisse auctor
-          auctor mauris nec rutrum. Sed sit amet laoreet augue. Quisque non lectus suscipit, tempor massa quis,
-          elementum mi. Curabitur viverra massa a libero viverra sollicitudin. Sed a sollicitudin risus, vitae viverra
-          sem. Aliquam a tempus dolor, nec tincidunt elit. Maecenas nibh urna, viverra ut faucibus vitae, porta in
-          dolor.
-          Mauris pulvinar viverra ligula eu porta. In mi felis, convallis eget mollis eu, mollis ut ipsum. Maecenas ac
-          massa tellus. Quisque quis purus ut massa interdum accumsan. Sed sit amet purus condimentum, sagittis dolor
-          vel, tempor quam. Ut in eros dui. Ut tristique maximus vehicula. Ut porta nunc in fermentum pulvinar. Morbi ac
-          pharetra enim. Vivamus ac enim erat. Pellentesque vel laoreet nunc. Integer sed molestie nisi, non aliquam
-          quam. Vivamus finibus nibh ut nulla blandit posuere. Ut feugiat aliquam feugiat.
-          Sed eu lorem at nunc facilisis dapibus. Aliquam eget gravida mauris. Mauris mattis hendrerit tortor in
-          maximus. Aenean condimentum condimentum laoreet. Duis in nisl malesuada, sollicitudin metus et, efficitur
-          nisi. Nulla quis consequat massa, vulputate aliquam metus. Cras vel vehicula arcu, auctor feugiat dolor. Donec
-          pharetra laoreet nisl non laoreet. Donec tempus purus dignissim, sodales arcu quis, fermentum nunc.
-          Suspendisse non porttitor augue, et ultricies turpis. Nunc tristique fermentum ex eget finibus. Duis tempor,
-          lorem sed iaculis cursus, neque nunc gravida diam, fermentum fringilla eros neque quis diam.
-          Vestibulum lacinia elit massa, at vestibulum nisi feugiat nec. Duis rhoncus sed magna id maximus. Nullam
-          consectetur gravida pulvinar. Nulla eleifend nulla non urna blandit feugiat. Morbi mattis enim nec est iaculis
-          malesuada. Suspendisse finibus nibh eu ante sagittis fermentum. Suspendisse quis magna posuere sapien gravida
-          varius. Etiam vehicula eu ipsum at efficitur. Aliquam lacinia tempus semper. Etiam dictum mollis odio. Donec
-          eu lorem venenatis eros convallis blandit ac sit amet lacus. Ut vulputate luctus metus ac sagittis. Curabitur
-          augue lacus, luctus non maximus at, tincidunt in felis. Vestibulum fringilla, turpis at tempor rutrum, nisi
-          metus gravida ex, luctus tincidunt est mi eu dui.
-          Aliquam porttitor magna tortor, cursus convallis quam efficitur vel. Nullam molestie arcu in turpis laoreet
-          suscipit. In id elit id eros convallis efficitur vitae eget dui. Nunc mollis, magna non auctor tempus, felis
-          nisi dapibus ipsum, nec auctor risus felis id metus. Curabitur pulvinar, dui eu ornare feugiat, tortor dolor
-          mattis augue, vitae congue lacus nisl in erat. Duis ex diam, interdum pharetra est non, consequat varius
-          sapien. Donec odio est, posuere tincidunt aliquet ut, porttitor et nunc. Curabitur varius lacus sed pharetra
-          pretium. Sed congue magna non quam malesuada porta.
-          Sed faucibus vestibulum purus eget maximus. Phasellus rutrum ligula ac aliquet elementum. Nulla vel accumsan
-          velit. Nam auctor tortor id sapien cursus dapibus. Sed euismod diam sed turpis tristique vestibulum.
-          Suspendisse laoreet tellus eget quam porta, ut feugiat mi convallis. Sed neque mi, lacinia ut dolor non,
-          fermentum vehicula mi. Curabitur lobortis suscipit vulputate. Nunc quis augue venenatis, dictum libero a,
-          ornare enim. Ut consectetur felis viverra porta fringilla. Nunc nec nibh mi. Vivamus eu eleifend velit.
-          Donec mauris mi, placerat et mauris ut, varius semper elit. Sed non euismod sapien. Sed a ultrices quam.
-          Quisque tincidunt ante sed nisi sodales efficitur. Praesent posuere tempor convallis. Fusce ornare diam
-          sapien, quis iaculis lorem pulvinar quis. Orci varius natoque penatibus et magnis dis parturient montes,
-          nascetur ridiculus mus. Curabitur dolor elit, dictum ac iaculis at, condimentum at urna. Phasellus euismod
-          vitae lorem quis volutpat. Phasellus eu ante id velit mattis elementum ac eu sem.
-          Phasellus faucibus, urna eget faucibus vehicula, erat urna sagittis erat, sed luctus tellus urna ut metus.
-          Phasellus quis commodo turpis, ut pulvinar urna. Quisque accumsan non elit ut tincidunt. Etiam tincidunt
-          bibendum porta. Aenean ultricies nibh eget odio vestibulum, at mollis turpis mollis. Suspendisse posuere
-          tellus vel egestas viverra. Fusce id egestas eros, sit amet interdum lacus. Fusce nec feugiat velit. Nunc
-          molestie lectus eu nisi suscipit sagittis. Ut non placerat odio. Aenean vehicula iaculis erat, a ornare massa
-          tristique in. Cras molestie sagittis rhoncus. In tristique et tortor hendrerit rutrum. Duis in dui nec orci
-          lobortis molestie. Sed consequat vulputate purus in condimentum. Morbi faucibus tortor ac ex semper, sed
-          tincidunt eros cursus.
-          Nullam ultricies ultrices tristique. Morbi vitae imperdiet sem, eget vehicula odio. Duis a magna id enim
-          eleifend tristique. In leo nunc, posuere a tincidunt vitae, facilisis nec ante. Ut enim justo, ornare eu quam
-          quis, dapibus venenatis risus. Quisque varius dapibus tempor. Phasellus vel erat ultrices, laoreet nibh eget,
-          imperdiet orci. In ultrices purus id fringilla facilisis. Interdum et malesuada fames ac ante ipsum primis in
-          faucibus. Curabitur elit ante, scelerisque nec malesuada quis, interdum vestibulum tortor. Morbi et sapien
-          tempor, elementum urna at, placerat nisl. Quisque ligula urna, eleifend et blandit quis, mollis vitae nulla.
-          Pellentesque elementum dolor quis efficitur sagittis. Integer vitae lacinia neque.
-          Donec ex purus, tincidunt in congue quis, scelerisque a lectus. Cras facilisis lorem ac ipsum elementum, ut
-          porttitor tellus egestas. Maecenas egestas venenatis dui, sed euismod est imperdiet imperdiet. In gravida
-          semper metus, ut dictum urna semper nec. Fusce elementum posuere orci, in blandit libero vestibulum quis.
-          Donec bibendum dictum porta. Mauris at eros eget purus aliquam venenatis ut a tortor. Aenean lacinia velit
-          urna, in fermentum velit aliquam sed. Nulla sodales enim quis ante vestibulum, vel malesuada sapien elementum.
+          KOCAELİ ÜNİVERSİTESİ ÇİFT ANADAL PROGRAMI YÖNETMELİĞİ
+          BİRİNCİ BÖLÜM
+          Amaç, Kapsam, Dayanak, Tanımlar ve Kısaltmalar
+          MADDE 1 - (1) Bu Yönetmeliğin amacı, Kocaeli Üniversitesinde çift anadal programlarının açılmasına,
+          başvuru ve kabul koşullarının belirlenmesine, yürütülmesine ve bitirilmesine ilişkin usul ve esasları
+          düzenlemektir.
+          Kapsam
+          MADDE 2 - (1) Bu Yönetmelik, Kocaeli Üniversitesi çift anadal programlarına ilişkin hükümleri kapsar.
+          Dayanak
+          MADDE 3 - (1) Bu Yönetmelik;
+          a) 2547 sayılı Yükseköğretim Kanununun 14 üncü maddesi,
+          b) 24/4/2010 tarihli ve 27561 sayılı Resmi Gazete'de yayımlanan Yükseköğretim Kurumlarında Önlisans ve
+          Lisans Düzeyindeki Programlar Arasında Geçiş, Çift Anadal, Yan Dal ile Kurumlar Arası Kredi Transferi
+          Yapılması Esaslarına İlişkin Yönetmelik,
+          c) 9/6/2017 tarihli ve 30091 sayılı Resmi Gazete'de yayımlanan Yükseköğretim Kurumlarında Önlisans ve
+          Lisans Düzeyindeki Programlar Arasında Geçiş, Çift Anadal, Yan Dal ile Kurumlar Arası Kredi Transferi
+          Yapılması Esaslarına İlişkin Yönetmelikte Değişiklik Yapılmasına Dair Yönetmelik hükümlerine
+          dayanılarak hazırlanmıştır.
+          Tanımlar ve kısaltmalar
+          MADDE 4 - (1) Bu Yönetmelikte geçen;
+          a) AKTS: Avrupa Kredi Transfer Sistemini,
+          b) Birinci anadal: Öğrencinin, başvuru tarihinde kayıtlı bulunduğu önlisans veya lisans programını,
+          c) Bölüm/Program: Kocaeli Üniversitesi lisans veya önlisans diploma programlarına öğrenci kabul eden
+          akademik birimlerini, ç) ÇAP: Çift anadal programını,
+          d) ÇAP Danışmanı: Öğrencilerin eğitim, öğretim ve diğer sorunlarıyla ilgilenmek üzere
+          görevlendirilen öğretim elemanını,
+          e) GNO: Genel not ortalamasını,
+          f) İkinci anadal: Öğrencinin başvurduğu ve kabul edildiği ikinci lisans veya önlisans diploma
+          programını,
+          g) Kurul: Kocaeli Üniversitesine bağlı fakülte/yüksekokul/meslek yüksekokulları kurullarını,
+          ğ) Rektör: Kocaeli Üniversitesi Rektörünü,
+          h) Senato: Kocaeli Universitesi Senatosunu,
+          ı) Üniversite: Kocaeli Üniversitesini.
+          i) Yönetim Kurulu: Kocaeli Üniversitesine bağlı fakülte/yüsekokul/meslek yüksekokulların yönetim
+          kurullarını,
+          ifade eder.
+          İKİNCİ BÖLÜM
+          Çift Anadat Programına İlişkin Esaslar
+          Çift anadal programının amacı
+          MADDE 5 - (1) Çift anadal programının amacı, öğrenimini yüksek başarı seviyesinde sürdüren
+          öğrencilere, Üniversitede yürütülen önlisans diploma programları ile diğer önlisans diploma
+          programları arasında, lisans programları ile diğer lisans programları veya önlisans programları arasında
+          öğrenim görme imkanı sağlamaktır.
+          (2) Üniversite bölümleri/programları arasında ÇAP uygulanabilir. Bölümler/Programlar arası ÇAP,
+          fakülte/yüksekokul/meslek yüksekokularının ilgili bölümlerinin/programlarının ÇAP komisyonları
+          tarafından Yüksek Öğretim Alan Yeterlilikleri dikkate alınarak, hazırlanıp ilgili kurul kararı ile Senatoya
+          sunulur. Senatoda onaylanan program, Üniversite akademik takviminde belirtilen tarihten itibaren uygulanır.
+          Başvuru ve kabul koşulları
+          MADDE 6-(1) ÇAP kontenjanları akademik yıl başlamadan, ilgili bölümlerin/programların görüşü alınarak,
+          fakülte/yüksekokul/meslek yüksekokulları tarafından yarıyılın başlangıcından önce ilan edilir.
+          (2) Başvuru anında anadal diploma programındaki GNO'su 4.00'lük not sisteminde en az 3.00 olan ve anadal
+          diploma programının ilgili sınıfında başarı sıralaması itibariyle ilk %20'sinde bulunan öğrenciler ikinci
+          anadal programına başvurabilir. Ayrıca aşağıdaki şartlar uyarınca fakülte/yüksekokul/meslek
+          yüksekokulları kontenjan belirleyebilir ve öğrenciler bu şartlar kapsamında başvuru yapabilir;
+          a) Çift anadal yapacak öğrencilerin kontenjanı, anadal diploma programındaki GNO'su en az 3.00 olmak
+          şartıyla, anadal diploma programının ilgili sınıfında başarı sıralaması %20'sinden az olmamak üzere Senato
+          tarafından belirlenir.
+          b) Hukuk, Tıp ve Sağlık Programları ile Mühendislik Programları hariç olmak üzere, çift anadal yapılacak
+          diğer ÇAP kontenjanları da bölümlerin/programların kontenjanının %20'sinden az olmamak üzere senato
+          tarafından belirlenir.
+          c) Anadal diploma programındaki GNO'su en az 3.00 olan ancak anadal diploma programının ilgili sınıfında
+          başarı sıralaması itibariyle en üst %20'sinde yer almayan öğrencilerden çift anadal yapılacak
+          bölümün/programın ilgili yıldaki taban puanından az olmamak üzere puana sahip olanlar da ÇAP'a
+          başvurabilirler.
+          (3) Başvuru sayısı kontenjandan fazla olduğu takdirde sıralamanın nasıl yapılacağı
+          fakülte/yüksekokul/meslek yüksekokulunca önceden belirlenir ve kontenjan ilanı ile birlikte öğrencilere
+          duyurulur.
+          (4) Özel yetenek sınavı olan bir bölümde/programda ÇAP yapılacak ise öğrencinin, girişte özel yetenek
+          sınavını başarması gerekir.
+          (5) İkinci anadal programına başvuran öğrenciler, başvurdukları bölüm/program için ÖSYM kılavuzunda
+          belirtilen veya ilgili birimler tarafından önceden belirlenmiş özel şartları sağlamalıdır.
+          (6) Kayıtlı olduğu önlisans veya lisans bölümünden/programından başvurduğu tarih itibari ile alması
+          gereken tüm dersleri alan ve başaran, ağırlıklı genel not ortalaması en az 3.00 olan öğrenciler ikinci
+          anadal diploma programına;
+          a) Anadal lisans diploma programında en erken üçüncü yarıyılın başında en geç ise dört yıllık
+          programlarda beşinci yarıyılın başında, beş yıllık programlarda yedinci yarıyılın başında, altı yıllık
+          programlarda ise dokuzuncu yarıyılın başında,
+          b) Anadal önlisans diploma programında en erken ikinci yarıyılın başında, en geç ise üçüncü yarıyılın
+          başında başvurabilir.
+          (7) ÇAP için başvurular, birinci ve ikinci anadal fakülte/yüksekokul/meslek yüksekokullarına yazılı
+          olarak yapılır. Kabul edilen öğrenciler, her iki anadala birden ders kayıtlarını yaptırırlar. ÇAP için
+          başvuru takvimi Senato tarafından belirlenir.
+          (8) En fazla iki programa ÇAP başvurusu yapılabilir. Birinci öğretim programı öğrencileri ikinci
+          öğretime veya ikinci öğretim programı öğrencileri de birinci öğretim programlarına başvurabilirler.
+          Ancak, birden fazla ikinci anadal diploma programına kayıt yapılmaz.
+          (9) ÇAP’a başvurabilmek için öğrencinin herhangi bir disiplin cezası almamış olması gerekir.(12.05.2019
+          30772RG)
+          Programın yürütülmesi/uygulanması
+          MADDE 7 - (1) Çift anadal programları ilgili bölümün/programın önerisi ile ilgili kurul tarafından her
+          iki programda öğrencinin mezuniyetine veya ilişiğinin kesilmesine kadar ÇAP danışmanları tarafından
+          izlenir.
+          (2) ÇAP'a kabul edilen öğrenciler için her iki programın ÇAP danışmanları ilgili programların AKTS'sini,
+          program yeterliklerini, derslerin amaç, içerik ve öğrenme kazanımlarını değerlendirerek öğrencinin
+          çift anadal ders planını hazırlarlar. Bu ders planında, hem birinci anadal, hem de ikinci anadalda
+          öğrencinin alması gereken tüm dersler yazılır. Her iki anadalın ÇAP danışmanları tarafından onaylanan bu
+          ders planları ikinci anadalın ilgili bölüm/program ve yönetim kurulunda görüşülerek karara bağlanır.
+          Yönetim kurulunca onaylanan ders planı ve Üniversitenin ÇAP Yönetmeliği, daha sonra öğrenciye imza
+          karşılığı tebliğ edilir. Bu ders planı hazırlandıktan sonra öğrencinin herhangi bir dersten muafiyet
+          isteği ya da plan dışında herhangi bir ders alma isteği değerlendirmeye alınmaz. Her iki anadaldan birinde
+          Senato tarafından onaylanan ders planı ve içeriklerinde değişiklik olmadığı sürece hazırlanan çift
+          anadal ders planında değişiklik yapılamaz.
+          (3) ÇAP'a kayıtlı öğrencinin ikinci anadal programından alacağı derslerin toplam AKTS'si, ilgili programın
+          toplam AKTS'sinin en az o/o35'i olmalıdır. Öğrencinin ikinci anadal programından alacağı herhangi bir ders,
+          birinci anadal programında muaf tutulamaz veya herhangi bir dersin yerine sayılamaz. Öğrencinin birinci
+          anadal programından aldığı herhangi bir ders, öğrencinin ders planında belirlenen ikinci anadal
+          programından %35 AKTS'lik derslerin dışında sayılması şartı ile ikinci anadal programında seçmeli
+          ders/dersler yerine sayılabilir.
+          (4) ÇAP öğrencileri devam ettikleri her iki anadal programında da, yürürlükte olan Kocaeli Üniversitesi
+          Önlisans ve Lisans Eğitim- Öğretim Yönetmeliğine tabidirler. Ancak çift anadal programı öğrencileri,
+          her bir anadalda ayrı ayrı bir öğrencinin ders alma limitlerini kullanabilirler.
+          (5) ÇAP öğrencileri, ikinci anadal bölüm/program başkanın onayı ile derslerinin ve sınavlarının
+          çakışması durumunda ikinci anadalı yaptıkları bölümün/programın birinci ya da ikinci öğretim
+          programından ders alabilir ve diğer öğretim sınav programında ilgili dersin sınavına girebilir. Buna
+          rağmen sınav programlarının uygun olmaması durumunda bu öğrenciler için ikinci anadalı yaptıkları ilgili
+          birimin yönetim kurulu kararıyla ayrı bir sınav takvimi de belirlenebilir.
+          (6) Ara sınavlar için herhangi bir nedenle sağlık raporu alan bir öğrenci, her iki anadaldan da raporlu
+          sayılır. Benzer şekilde izinli ya da mazeretli olarak yapılan değerlendirmeler her iki anadalı da kapsar.
+          (7) Her iki anadalda İngilizce destekli eğitim yapılmakta ise ikinci anadalda %30 İngilizce ders alma
+          koşulu aranmaz.
+          (8) Türkçe eğitim yapan bir anadaldan, İngilizce destekli eğitim yapan ikinci anadala geçmek isteyen
+          öğrencilerin İngilizce dil yeterliklerini belgelemeleri ön koşuldur. Senato tarafından belirlenen
+          esaslara göre dil yeterliğini belgeleyen adaylar arasında, GNO dikkate alınarak sıralama yapılır. ÇAP
+          kontenjanı dolmaması halinde, dil yeterliğini sağlayamayan adaylara, kendi imkanları ile dil yeterliğini
+          sağlamaları için bir yıl süre verilir. Bu süre içerisinde dil yeterliğini veremeyen adaylar kesin kayıt
+          hakkını kaybederler. İkinci anadal ÇAP danışmanı tarafından ikinci anadalda %30 İngilizce ders alma
+          koşulu sağlanacak şekilde öğrenciye çift anadal ders planı hazırlanır. Ders planında ikinci anadalın
+          yapıldığı lisans programına kayıtlı öğrencilerin öğrenim süreleri boyunca aldıkları İngilizce dersin
+          AKTS eşdeğerinde dersin, ÇAP yapan öğrenci tarafından alınması sağlanır.
+          Başarı değerlendirme ve kayıt silme
+          MADDE 8 - (1) Öğrencinin kendi bölümünün/programının önlisans veya lisans programı ile çift anadal
+          programının ayrılığı
+          esastır. Ögrencinin birinci anadaldan mezuniyeti ÇAP nedeni ile etkilenmez. Birinci anadaldan mezun olan
+          öğrenciye birinci anadal önlisans/lisans diploması verilir. Öğrencinin ikinci anadaldan mezuniyet
+          diploması, ancak devam ettiği birinci anadal programından mezun olması halinde verilir.
+          (2) ÇAP öğrencilerine, istedikleri takdirde, birinci anadal ve ikinci anadal programları için ayrı ayrı
+          öğrenim belgesi verilir. Her bir öğrenim belgesinde sadece öğrencinin o anadala ait aldığı dersler
+          gösterilir. İkinci anadaldan alınacak olan not durum belgesinde, öğrencinin ÇAP programına başladığı
+          anadaldaki muaf tutulduğu dersler de gösterilir.
+          (3) Öğrencilerin, her yarıyıl (yıllık ders planı uygulayan bölümlerde/programlarda yıl) sonunda
+          bölümlerin/programların ÇAP danışmanları tarafından, birinci anadaldaki yarıyıl (yıllık ders planı
+          uygulayan bölümlerde/programlarda yıl) sonu not ortalamaları ilgili
+
+          yönetim kuruluna sunulur. Önlisans veya lisans öğrencilerinin ÇAP'a devam edebilmeleri ve mezun
+          olabilmeleri için her yarıyıl (yıllık ders planı uygulayan bölümlerde/programlarda yıl) sonu itibarı ile
+          birinci anadala ait GNO'nun en az 2.50 olması şartı aranır. Ancak, tüm ÇAP öğrenimi süresince
+          öğrencinin birinci anadal genel not ortalaması bir defaya mahsus olmak üzere 2.00-2.49 arasında olabilir.
+          GNO'su 2.00-2.49 arasında kalan öğrencilere ilgili fakülte/yüksekokul/meslek yüksekokul tarafından uyarı
+          yazısı yazılarak programa devam etme hakkı tanınır. Genel not ortalaması ikinci kez 2.50'nin altına düşen
+          öğrencinin ikinci anadal diploma programından ilgili yönetim kurulu kararı ile kaydı silinir.
+          (4) Birinci anadal GNO'su 2.00'ın altına düşen öğrencinin ikinci anadal programından kaydı ilgili yönetim
+          kurulu kararı ile silinir. (5) Öğrenciler, çift anadal programından kendi isteği ile ayrılabilir.
+          (6) İkinci anadal programından iki yarıyıl (yıllık ders planı uygulayan bölümlerde/programlarda iki yıl)
+          üst üste ders almayan
+          öğrencinin ikinci anadal diploma programından kaydı silinir.
+          (7) ÇAP’a kayıt yaptıran öğrencilerin öğrenim süresi içerisinde herhangi bir disiplin cezası almaları
+          durumunda, disiplin cezası
+          aldıkları yarıyıl sonu itibarıyla ikinci anadal programından ilgili yönetim kurulu kararı ile kayıtları
+          silinir. (12.05.2019-30772 RG)
+          Özel öğrenci
+          MADDE 9 - (1) Geçerli mazereti ilgili kurul ve Senato onayı ile kabul edilen ÇAP öğrencisi, en fazla bir
+          yarıyıl (yıllık ders planı
+          uygulayan bölümlerde/programlarda bir yıl) başka bir yükseköğretim kurumunda özel öğrenci olarak
+          devam edebilir. Ancak birinci anadal programından mezun olan ÇAP öğrencisi, başka bir yükseköğretim
+          kurumunda özel öğrenci olarak devam edemez.
+          Proje, staj, bitirme çalışması ve işyeri eğitimi uygulamaları
+          MADDE 10, (1) ÇAP'ta hem birinci hem de ikinci anadala ait proje, staj ve bitirme çalışmalarının ayrı ayrı
+          yapılması zorunlu olup muafiyeti yapılamaz. İşletmede Mühendislik/Mesleki Eğitim (İME) uygulamalarının
+          eşdeğerliği ve ikinci anadalda hangilerinin, hangi içerikte ve sürelerde yapılması gerektiği,
+          öğrencinin ikinci anadal yaptığı bölüm/program tarafından önerilir ve ilgili birimin yönetim kurulu
+          tarafından karara bağlanır.
+          Mezuniyet
+          MADDE 11 - (1) ÇAP'taki başarı ve mezuniyet koşulları bu Yönetmeliğin ilgili maddelerine göre
+          belirlenir.
+          (2) ÇAP öğrencileri, sadece birinci anadal programında başarı sıralamasına tabi tutulur.
+          (3) ÇAP süresi içinde birinci anadaldan mezun olan öğrencinin öğrencilik işlemleri, ikinci anadala ait
+          bölüm/program ve
+          fakülte/yüksekokul/meslek yüksekokul tarafından yürütülür..
+          (4) Birinci anadaldan mezuniyet hakkını elde etmek koşulu ile çift anadal programını tamamlayan öğrenciye
+          ayrıca ikinci anadalı
+          yaptığı bölümün./programın önlisans veya lisans diploması verilir.
+          Katkı payı
+          MADDE 12 - (1) ÇAP'a tabi öğrenciler, birinci anadaldan mezun oluncaya kadar sadece birinci anadala ait,
+          mezun olduktan sonra ise sadece ikinci anadala ait öğrenci katkı payını yürürlükteki yasal mevzuata uygun
+          olarak öderler.
+          ÜÇÜNCÜ BÖLÜM Çeşitli ve Son Hükümler
+          Yürürlükten kaldırılan yönetmelik
+          MADDE 13 - (1) 2016/2016 tarihli ve 29748 sayılı Resmi Gazete'de yayımlanan Kocaeli Üniversitesi Çift Anadal
+          Programı Yönetmeliği yürürlükten kaldırılmıştır.
+          Hüküm bulunmayan haller
+          MADDE 14-(1) Bu Yönetmelikte hüküm bulunmayan hallerde; yürürlükte olan Kocaeli Üniversitesi Önlisans
+          ve Lisans Eğitim- Öğretim Yönetmeliği, Kocaeli Üniversitesi Önlisans ve Lisans Programları İçin Özel
+          Ögrenci Yönergesi ile Yükseköğretim Kurumlarında Önlisans ve Lisans Düzeyindeki Programlar Arasında
+          Geçiş, Çift Anadal, Yan Dal ile Kurumlar Arası Kredi Transferi Yapılması Esaslarına İlişkin Yönetmelik
+          hükümleri ve Senato kararları uygulanır.
+          Geçici Hüküm
+          Madde 1 – (1) ÇAP öğrencisinin bu Yönetmeliğin yürürlüğe girmesinden önce almış olduğu disiplin
+          cezasından dolayı ikinci anadal programında kaydı silinmez. (12.05.2019-30772 RG)
+          Yürürlük
+          MADDE 15 - (1) Bu Yönetmelik, 2019-2020 eğitim-öğretim yılında yürürlüğe girer.
+          Yürütme
+          MADDE 16 - (1) Bu Yönetmelik hükümlerini Kocaeli Üniversitesi Rektörü yürütür
         </Text>
       </ScrollView>
       <View>
@@ -432,14 +620,20 @@ const DoubleMajorAppealFirstScreen = () => {
                     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                       <Text>{name.length > 25 ? name.substring(0, 22) + "..." : name}</Text>
                       <TouchableOpacity style={{ marginLeft: 18 }}
-                                        onPress={() => deleteFile('x', name)}>
+                                        onPress={() => deleteFile("x", name)}>
                         <Icon name="close" type="ionicon" />
                       </TouchableOpacity>
-                      <Button style={{ marginLeft: 4 }} mode="contained" onPress={async () => await uploadFile("x")}><Text
+                      <Button style={{ marginLeft: 4 }} mode="contained" loading={fileXisLoading}
+                              onPress={async () => {
+                                  setFileXisLoading(true);
+                                  await uploadFile("x");
+                                }
+                              }><Text
                         style={{ color: "#fff" }}>Yükle</Text></Button>
                     </View>
                   );
-                }) : <Text style={{ paddingHorizontal: 64, paddingVertical: 6 }}>X Evrağı Yükle</Text>}
+                }) : <Text style={{ paddingHorizontal: 64, paddingVertical: 6, textAlign: "center" }}>Başvuru
+                  Dilekçesi </Text>}
               </TouchableOpacity>
             </View>
             <View key={1}>
@@ -460,14 +654,18 @@ const DoubleMajorAppealFirstScreen = () => {
                     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                       <Text>{name.length > 25 ? name.substring(0, 22) + "..." : name}</Text>
                       <TouchableOpacity style={{ marginLeft: 18 }}
-                                        onPress={() => deleteFile('y', name)}>
+                                        onPress={() => deleteFile("y", name)}>
                         <Icon name="close" type="ionicon" />
                       </TouchableOpacity>
-                      <Button style={{ marginLeft: 4 }} mode="contained" onPress={async () => await uploadFile("y")}><Text
+                      <Button style={{ marginLeft: 4 }} mode="contained" loading={fileYisLoading}
+                              onPress={async () => {
+                                setFileYisLoading(true)
+                                await uploadFile("y");
+                              }}><Text
                         style={{ color: "#fff" }}>Yükle</Text></Button>
                     </View>
                   );
-                }) : <Text style={{ paddingHorizontal: 64, paddingVertical: 6 }}>Y Evrağı Yükle</Text>}
+                }) : <Text style={{ paddingHorizontal: 64, paddingVertical: 6, textAlign: "center" }}>Transkript</Text>}
               </TouchableOpacity>
             </View>
             <View key={2}>
@@ -488,14 +686,19 @@ const DoubleMajorAppealFirstScreen = () => {
                     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                       <Text>{name.length > 25 ? name.substring(0, 22) + "..." : name}</Text>
                       <TouchableOpacity style={{ marginLeft: 18 }}
-                                        onPress={() => deleteFile('z', name)}>
+                                        onPress={() => deleteFile("z", name)}>
                         <Icon name="close" type="ionicon" />
                       </TouchableOpacity>
-                      <Button style={{ marginLeft: 4 }} mode="contained" onPress={async () => await uploadFile("z")}><Text
+                      <Button style={{ marginLeft: 4 }} mode="contained" loading={fileZisLoading}
+                              onPress={async () => {
+                                setFileZisLoading(true)
+                                await uploadFile("z");
+                              }}><Text
                         style={{ color: "#fff" }}>Yükle</Text></Button>
                     </View>
                   );
-                }) : <Text style={{ paddingHorizontal: 64, paddingVertical: 6 }}>Z Evrağı Yükle</Text>}
+                }) : <Text style={{ paddingHorizontal: 64, paddingVertical: 6, textAlign: "center" }}>Başarı
+                  sıralaması</Text>}
               </TouchableOpacity>
             </View>
             <View key={3}>
@@ -512,30 +715,89 @@ const DoubleMajorAppealFirstScreen = () => {
                 onPress={() => docPicker("q")}
               >
                 {fileQ[0].name ? fileQ.map(({ name, uri }) => {
+                    return (
+                      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                        <Text>{name.length > 25 ? name.substring(0, 22) + "..." : name}</Text>
+                        <TouchableOpacity style={{ marginLeft: 18 }}
+                                          onPress={() => deleteFile("q", name)}>
+                          <Icon name="close" type="ionicon" />
+                        </TouchableOpacity>
+                        <Button style={{ marginLeft: 4 }} mode="contained" loading={fileQisLoading}
+                                onPress={async () => {
+                                  setFileQisLoading(true)
+                                  await uploadFile("q");
+                                }}><Text
+                          style={{ color: "#fff" }}>Yükle</Text></Button>
+                      </View>
+                    );
+                  }) :
+                  <Text style={{ paddingHorizontal: 64, paddingVertical: 6, textAlign: "center" }}>ÖSYM Belgesi</Text>}
+              </TouchableOpacity>
+            </View>
+            <View key={4}>
+              <TouchableOpacity
+                style={{
+                  marginTop: 6,
+                  paddingVertical: 8,
+                  paddingLeft: 18,
+                  paddingRight: 12,
+                  borderWidth: 1,
+                  borderColor: "rgba(0,0,0,.3)",
+                  borderRadius: 6,
+                }}
+                onPress={() => docPicker("f")}
+              >
+                {fileF[0].name ? fileF.map(({ name, uri }) => {
                   return (
                     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                       <Text>{name.length > 25 ? name.substring(0, 22) + "..." : name}</Text>
                       <TouchableOpacity style={{ marginLeft: 18 }}
-                                        onPress={() => deleteFile('q', name)}>
+                                        onPress={() => deleteFile("f", name)}>
                         <Icon name="close" type="ionicon" />
                       </TouchableOpacity>
-                      <Button style={{ marginLeft: 4 }} mode="contained" onPress={async () => await uploadFile("q")}><Text
+                      <Button style={{ marginLeft: 4 }} mode="contained" loading={fileFisLoading}
+                              onPress={async () => {
+                                setFileFisLoading(true)
+                                await uploadFile("f");
+                              }}><Text
                         style={{ color: "#fff" }}>Yükle</Text></Button>
                     </View>
                   );
-                }) : <Text style={{ paddingHorizontal: 64, paddingVertical: 6 }}>Q Evrağı Yükle</Text>}
+                }) : <Text style={{ paddingHorizontal: 64, paddingVertical: 6, textAlign: "center" }}>Yabancı Dil
+                  Belgesi</Text>}
               </TouchableOpacity>
             </View>
           </View>
         </View>
       </View>
       <View style={styles.nextButtonContainer}>
-        <Text style={{color: '#28A745'}}>{fileUploadedLoader ? 'Dosya yüklendi.' : ''}</Text>
-        <Button mode="contained" onPress={() => console.log("pressed")} disabled={!isUploadedFileX[0].name || !isUploadedFileY[0].name || !isUploadedFileZ[0].name || !isUploadedFileQ[0].name}>
-          <Text style={{ color: "#fff" }}>Devam</Text>
+        <Text style={{ color: "#28A745" }}>{fileUploadedLoader ? "Dosya yüklendi." : ""}</Text>
+        <Button mode="contained" onPress={() => setIsDialogVisible(true)}
+                disabled={!checked || !isUploadedFileX[0].name || !isUploadedFileY[0].name || !isUploadedFileZ[0].name || !isUploadedFileQ[0].name}>
+          <Text style={{ color: "#fff" }}>BAŞVURUYU TAMAMLA</Text>
         </Button>
       </View>
+      <Portal>
+        <Dialog visible={isDialogVisible} onDismiss={() => setIsDialogVisible(false)}>
+          <Dialog.Title>{"başvuruyu tamamla".toLocaleUpperCase()}</Dialog.Title>
+          <Dialog.Content>
+            <View style={styles.acceptTerms}>
+              <Checkbox status={lastAcceptTermsAndConditions ? "checked" : "unchecked"}
+                        onPress={() => {
+                          setLastAcceptTermsAndConditions(!lastAcceptTermsAndConditions);
+                        }}
 
+              />
+              <Text>Evrakları doğru doldurduğumu ve bana ait olduğunu onaylıyorum.</Text>
+            </View>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setIsDialogVisible(false)}>Vazgeç</Button>
+            <Button onPress={() => finishAppeal()}
+                    disabled={!lastAcceptTermsAndConditions}>Onayla</Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
     </View>
   );
 };
@@ -556,10 +818,13 @@ const styles = StyleSheet.create({
   },
   scv: {
     flex: 1,
-    backgroundColor: "blue",
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0, .2)',
+    borderRadius:4,
+    padding:8,
   },
   nextButtonContainer: {
-    flexDirection:'row',
+    flexDirection: "row",
     alignItems: "center",
     alignContent: "space-between",
     justifyContent: "space-between",

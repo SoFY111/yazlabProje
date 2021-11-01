@@ -51,19 +51,19 @@ const Application = () => {
         </View>
       </View>
       <ScrollView style={{ width: "100%", marginTop:14 }}>
-        <MUIButton style={styles.boxes} mode="contained" theme={{ roundness: 3 }} onPress={() => navigation.navigate('NecessaryPapers', {type:'DoubleMajor'})}>
+        <MUIButton style={styles.boxes} mode="contained" theme={{ roundness: 3 }} onPress={() => navigation.navigate('NecessaryPapers', {type:0})}>
           <Text style={styles.texts}>{"çap başvuru".toLocaleUpperCase()}</Text>
         </MUIButton>
-        <MUIButton style={styles.boxes} mode="contained" theme={{ roundness: 3 }} onPress={() => navigation.navigate('NecessaryPapers', {type:'VerticalTransfer'})}>
+        <MUIButton style={styles.boxes} mode="contained" theme={{ roundness: 3 }} onPress={() => navigation.navigate('NecessaryPapers', {type:1})}>
           <Text style={styles.texts}>{"dgs başvuru".toLocaleUpperCase()}</Text>
         </MUIButton>
-        <MUIButton style={styles.boxes} mode="contained" theme={{ roundness: 3 }} onPress={() => navigation.navigate('NecessaryPapers', {type:'HorizontalTransfer'})}>
+        <MUIButton style={styles.boxes} mode="contained" theme={{ roundness: 3 }} onPress={() => navigation.navigate('NecessaryPapers', {type:2})}>
           <Text style={styles.texts}>{"yatay geçiş başvuru".toLocaleUpperCase()}</Text>
         </MUIButton>
-        <MUIButton style={styles.boxes} mode="contained" theme={{ roundness: 3 }} onPress={() => navigation.navigate('NecessaryPapers', {type:'SummerSchool'})}>
+        <MUIButton style={styles.boxes} mode="contained" theme={{ roundness: 3 }} onPress={() => navigation.navigate('NecessaryPapers', {type:3})}>
           <Text style={styles.texts}>{"yaz okulu başvuru".toLocaleUpperCase()}</Text>
         </MUIButton>
-        <MUIButton style={styles.boxes} mode="contained" theme={{ roundness: 3 }} onPress={() => navigation.navigate('NecessaryPapers', {type:'ClassAdaptation'})}>
+        <MUIButton style={styles.boxes} mode="contained" theme={{ roundness: 3 }} onPress={() => navigation.navigate('NecessaryPapers', {type:4})}>
           <Text style={styles.texts}>{"ders intibak başvuru".toLocaleUpperCase()}</Text>
         </MUIButton>
       </ScrollView>

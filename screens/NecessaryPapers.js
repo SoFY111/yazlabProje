@@ -23,29 +23,22 @@ const NecessaryPapers = () => {
 
 
   const navigation = useNavigation();
-  const type = useRoute().params.type;
-  const [declareAppealType, setDeclareAppealType] = useState(0);
+  const declareAppealType = useRoute().params.type //Başvuru tipini tanımla (0, 1, 2, 3, 4 durumu .app.config.txt dosyasında belirtildi)
 
-  //Başvuru tipini tanımla (0, 1, 2, 3, 4 durumu .app.config.txt dosyasında belirtildi)
-  useEffect(() => {
-    if (type == "VerticalTransfer") setDeclareAppealType(1);
-    else if (type == "HorizontalTransfer") setDeclareAppealType(2);
-    else if (type == "SummerSchool") setDeclareAppealType(3);
-    else if (type == "ClassAdaptation") setDeclareAppealType(4);
-
-  }, []);
 
   //Eğer yarım kalan bi başvuru varsa oraya yönlendir.
   useEffect( ()  => {
+    console.log('appealType: ' + declareAppealType)
     firestore().collection('users')
       .doc(auth().currentUser.uid)
       .collection('appeals')
       .get()
       .then(querySnapshot => {
         querySnapshot.docs.map(doc => {
+          console.log(doc.data())
           if(doc.data()?.appealType === declareAppealType && doc.data()?.isStart === 2){
             if(declareAppealType === 0) navigation.navigate('DoubleMajorAppealFirstScreen', {appealUUID: doc.data()?.appealUUID});
-            else if(declareAppealType === 1) navigation.navigate('VerticalAppealFirstScreen');
+            else if(declareAppealType === 1) navigation.navigate('VerticalAppealFirstScreen', {appealUUID: doc.data()?.appealUUID});
           }
         })
       })
@@ -63,6 +56,8 @@ const NecessaryPapers = () => {
           appealUUID,
           appealType,
           isStart: 2,
+          percent: 0,
+          files:{}
         }, { merge: true });
       if(appealType === 0) navigation.navigate('DoubleMajorAppealFirstScreen');
       else if(appealType === 1) navigation.navigate('VerticalAppealFirstScreen');

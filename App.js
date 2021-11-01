@@ -71,7 +71,7 @@ const ApplicationStackScreen = () => {
                            options={{ title: "BAŞVURULAR", headerTitleAlign: "center" }} />
       <ApplicationStack.Screen name="NecessaryPapers" component={NecessaryPapers} options={{title:'Gerekli Evraklar', headerTitleAlign:'center'}}/>
       <ApplicationStack.Screen name="DoubleMajorAppealFirstScreen" component={DoubleMajorAppealFirstScreen} options={{title:'Çap Başvuru', headerTitleAlign:'center'}}/>
-      <ApplicationStack.Screen name="VerticalAppealFirstScreen" component={VerticalAppealFirstScreen} options={{title:'Çap Başvuru', headerTitleAlign:'center'}}/>
+      <ApplicationStack.Screen name="VerticalAppealFirstScreen" component={VerticalAppealFirstScreen} options={{title:'Dikey Geçiş Başvuru', headerTitleAlign:'center'}}/>
     </ApplicationStack.Navigator>
   );
 };
