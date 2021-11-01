@@ -65,14 +65,6 @@ const NecessaryPapers = () => {
     catch (e){
       navigation.navigate('main');
     }
-
-    /*await firestore().collection('appeals').doc(auth().currentUser.uid).collection(appealUUID).doc(appealUUID).set({
-       appealUUID,
-       appealType: 0,
-       isStart: 1,
-   }
- , {merge:true})*/
-
   };
 
   return (
