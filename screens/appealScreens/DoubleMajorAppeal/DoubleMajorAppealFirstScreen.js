@@ -19,8 +19,13 @@ const DoubleMajorAppealFirstScreen = () => {
   const [fileY, setFileY] = useState([{ name: null, uri: null }]);
   const [fileZ, setFileZ] = useState([{ name: null, uri: null }]);
   const [fileQ, setFileQ] = useState([{ name: null, uri: null }]);
+  const [isUploadedFileX, setIsUploadedFileX] = useState([{ name: null, uri: null }]);
+  const [isUploadedFileY, setIsUploadedFileY] = useState([{ name: null, uri: null }]);
+  const [isUploadedFileZ, setIsUploadedFileZ] = useState([{ name: null, uri: null }]);
+  const [isUploadedFileQ, setIsUploadedFileQ] = useState([{ name: null, uri: null }]);
+  const [fileUploadedLoader, setFileUploadedLoader] = useState(false)
   const [userData, setUserData] = useState(null);
-  const [appealUUID, setAppealUUID] = useState("");
+  const [appealUUID, setAppealUUID] = useState(useRoute().params.appealUUID);
   const appealUUIDroute = useRoute().params.appealUUID;
 
   useEffect(() => {
@@ -32,16 +37,39 @@ const DoubleMajorAppealFirstScreen = () => {
       .then(querySnapshot => {
         setUserData(querySnapshot.data());
       });
+  }, []);
 
+  useEffect(() => {
+    console.log('uid:' + auth().currentUser.uid)
+    console.log('appeal: '+ appealUUID)
     firestore().collection("users")
       .doc(auth().currentUser.uid)
       .collection('appeals')
       .doc(appealUUID)
       .get()
       .then(querySnapshot => {
-        console.log(querySnapshot.data())
+        console.log(querySnapshot.data()?.appealUUID)
+        if(querySnapshot.exists){
+          if(querySnapshot.data()?.files.fileX) {
+            setFileX([{ name: querySnapshot.data()?.files?.fileX }]);
+            setIsUploadedFileX([{name: querySnapshot.data()?.files?.fileX }])
+          }
+          if(querySnapshot.data()?.files.fileY) {
+            setFileY([{ name: querySnapshot.data()?.files?.fileY }]);
+            setIsUploadedFileY([{name: querySnapshot.data()?.files?.fileY }])
+          }
+          if(querySnapshot.data()?.files.fileZ) {
+            setFileZ([{ name: querySnapshot.data()?.files?.fileZ }]);
+            setIsUploadedFileZ([{name: querySnapshot.data()?.files?.fileZ }])
+          }
+          if(querySnapshot.data()?.files.fileQ) {
+            setFileQ([{ name: querySnapshot.data()?.files?.fileQ }]);
+            setIsUploadedFileQ([{name: querySnapshot.data()?.files?.fileQ }])
+          }
+        }
+
       })
-  }, []);
+  }, [])
 
 
   const docPicker = async (type) => {
@@ -91,7 +119,6 @@ const DoubleMajorAppealFirstScreen = () => {
     }
   };
 
-
   const uploadFile = async (type) => {
     let file
 
@@ -116,7 +143,8 @@ const DoubleMajorAppealFirstScreen = () => {
     let task;
 
     if(extension === 'pdf') task = storage().ref('pdf/'+ appealUUID + '/' + fileName).putFile(fileUri);
-    else task = storage().ref('images/'+ appealUUID + '/' + fileName).putFile(fileUri);
+    else if(extension === 'jpg' || extension === 'jpeg' ||extension === 'png') task = storage().ref('images/'+ appealUUID + '/' + fileName).putFile(fileUri);
+    else task = storage().ref('documents/'+ appealUUID + '/' + fileName).putFile(fileUri);
 
 
     try {
@@ -129,7 +157,14 @@ const DoubleMajorAppealFirstScreen = () => {
           files: {
             fileX: fileName
           }
-        }, {merge: true})
+        }, {merge: true}).then(() => {
+          setFileX([{name: fileName, uri: null}])
+          setIsUploadedFileX([{name: fileName}])
+          setFileUploadedLoader(true);
+          setTimeout( () => {
+            setFileUploadedLoader(false)
+          }, 2000)
+        })
       else if(type === 'y') await firestore().collection("users")
         .doc(auth().currentUser.uid)
         .collection('appeals')
@@ -138,7 +173,14 @@ const DoubleMajorAppealFirstScreen = () => {
           files: {
             fileY: fileName
           }
-        }, {merge: true})
+        }, {merge: true}).then(() => {
+          setFileY([{name: fileName, uri: null}])
+          setIsUploadedFileY([{name: fileName}])
+          setFileUploadedLoader(true);
+          setTimeout( () => {
+            setFileUploadedLoader(false)
+          }, 2000)
+        })
       else if(type === 'z') await firestore().collection("users")
         .doc(auth().currentUser.uid)
         .collection('appeals')
@@ -147,7 +189,14 @@ const DoubleMajorAppealFirstScreen = () => {
           files: {
             fileZ: fileName
           }
-        }, {merge: true})
+        }, {merge: true}).then(() => {
+          setFileZ([{name: fileName, uri: null}])
+          setIsUploadedFileZ([{name: fileName}])
+          setFileUploadedLoader(true);
+          setTimeout( () => {
+            setFileUploadedLoader(false)
+          }, 2000)
+        })
       else if(type === 'q') await firestore().collection("users")
         .doc(auth().currentUser.uid)
         .collection('appeals')
@@ -156,11 +205,93 @@ const DoubleMajorAppealFirstScreen = () => {
           files: {
             fileQ: fileName
           }
-        }, {merge: true})
+        }, {merge: true}).then(() => {
+          setFileQ([{name: fileName, uri: null}])
+          setIsUploadedFileQ([{name: fileName}])
+          setFileUploadedLoader(true);
+          setTimeout( () => {
+            setFileUploadedLoader(false)
+          }, 2000)
+        })
     } catch (e) {
       console.log(e.message);
     }
   };
+
+  const deleteFile = async (type, fileName) => {
+
+    const extension = fileName.split(".").pop();
+    let fileExtensionPath;
+    if(extension === 'pdf') fileExtensionPath = 'pdf'
+    else if(extension === 'jpg' || extension === 'jpeg' ||extension === 'png') fileExtensionPath = 'images'
+    else fileExtensionPath = 'documents';
+
+    try{
+      console.log(fileExtensionPath + '/' + appealUUID + '/' + fileName)
+      await storage().ref(fileExtensionPath + '/' + appealUUID + '/' + fileName).delete()
+        .then(() => {
+          if(type === 'x') {
+            firestore().collection('users')
+              .doc(auth().currentUser.uid)
+              .collection('appeals')
+              .doc(appealUUID)
+              .set({
+                files:{
+                  fileX: null
+                }
+              }, {merge: true}).then(() => {
+              setFileX([{ name: null, uri: null }]);
+              setIsUploadedFileX([{name: null}])
+            })
+          }
+          else if(type === 'y') {
+            firestore().collection('users')
+              .doc(auth().currentUser.uid)
+              .collection('appeals')
+              .doc(appealUUID)
+              .set({
+                files:{
+                  fileY: null
+                }
+              }, {merge: true}).then(() => {
+              setFileY([{ name: null, uri: null }]);
+              setIsUploadedFileY([{name: null}])
+            })
+          }
+          else if(type === 'z') {
+            firestore().collection('users')
+              .doc(auth().currentUser.uid)
+              .collection('appeals')
+              .doc(appealUUID)
+              .set({
+                files:{
+                  fileZ: null
+                }
+              }, {merge: true}).then(() => {
+              setFileZ([{ name: null, uri: null }]);
+              setIsUploadedFileZ([{name: null}])
+            })
+          }
+          else if(type === 'q') {
+            firestore().collection('users')
+              .doc(auth().currentUser.uid)
+              .collection('appeals')
+              .doc(appealUUID)
+              .set({
+                files:{
+                  fileQ: null
+                }
+              }, {merge: true}).then(() => {
+              setFileQ([{ name: null, uri: null }]);
+              setIsUploadedFileQ([{name: null}])
+            })
+          }
+        }
+      )
+    }catch(e){
+      console.log(e.message)
+    }
+  }
 
   const [checked, setChecked] = useState(false);
 
@@ -299,9 +430,9 @@ const DoubleMajorAppealFirstScreen = () => {
                 {fileX[0].name ? fileX.map(({ name, uri }) => {
                   return (
                     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-                      <Text>{name}</Text>
+                      <Text>{name.length > 25 ? name.substring(0, 22) + "..." : name}</Text>
                       <TouchableOpacity style={{ marginLeft: 18 }}
-                                        onPress={() => setFileX([{ name: null, uri: null }])}>
+                                        onPress={() => deleteFile('x', name)}>
                         <Icon name="close" type="ionicon" />
                       </TouchableOpacity>
                       <Button style={{ marginLeft: 4 }} mode="contained" onPress={async () => await uploadFile("x")}><Text
@@ -327,9 +458,9 @@ const DoubleMajorAppealFirstScreen = () => {
                 {fileY[0].name ? fileY.map(({ name, uri }) => {
                   return (
                     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-                      <Text>{name}</Text>
+                      <Text>{name.length > 25 ? name.substring(0, 22) + "..." : name}</Text>
                       <TouchableOpacity style={{ marginLeft: 18 }}
-                                        onPress={() => setFileY([{ name: null, uri: null }])}>
+                                        onPress={() => deleteFile('y', name)}>
                         <Icon name="close" type="ionicon" />
                       </TouchableOpacity>
                       <Button style={{ marginLeft: 4 }} mode="contained" onPress={async () => await uploadFile("y")}><Text
@@ -355,9 +486,9 @@ const DoubleMajorAppealFirstScreen = () => {
                 {fileZ[0].name ? fileZ.map(({ name, uri }) => {
                   return (
                     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-                      <Text>{name}</Text>
+                      <Text>{name.length > 25 ? name.substring(0, 22) + "..." : name}</Text>
                       <TouchableOpacity style={{ marginLeft: 18 }}
-                                        onPress={() => setFileZ([{ name: null, uri: null }])}>
+                                        onPress={() => deleteFile('z', name)}>
                         <Icon name="close" type="ionicon" />
                       </TouchableOpacity>
                       <Button style={{ marginLeft: 4 }} mode="contained" onPress={async () => await uploadFile("z")}><Text
@@ -383,9 +514,9 @@ const DoubleMajorAppealFirstScreen = () => {
                 {fileQ[0].name ? fileQ.map(({ name, uri }) => {
                   return (
                     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-                      <Text>{name}</Text>
+                      <Text>{name.length > 25 ? name.substring(0, 22) + "..." : name}</Text>
                       <TouchableOpacity style={{ marginLeft: 18 }}
-                                        onPress={() => setFileQ([{ name: null, uri: null }])}>
+                                        onPress={() => deleteFile('q', name)}>
                         <Icon name="close" type="ionicon" />
                       </TouchableOpacity>
                       <Button style={{ marginLeft: 4 }} mode="contained" onPress={async () => await uploadFile("q")}><Text
@@ -399,7 +530,8 @@ const DoubleMajorAppealFirstScreen = () => {
         </View>
       </View>
       <View style={styles.nextButtonContainer}>
-        <Button mode="contained" onPress={() => console.log("pressed")}>
+        <Text style={{color: '#28A745'}}>{fileUploadedLoader ? 'Dosya yüklendi.' : ''}</Text>
+        <Button mode="contained" onPress={() => console.log("pressed")} disabled={!isUploadedFileX[0].name || !isUploadedFileY[0].name || !isUploadedFileZ[0].name || !isUploadedFileQ[0].name}>
           <Text style={{ color: "#fff" }}>Devam</Text>
         </Button>
       </View>
@@ -427,9 +559,10 @@ const styles = StyleSheet.create({
     backgroundColor: "blue",
   },
   nextButtonContainer: {
-    alignItems: "flex-end",
-    alignContent: "flex-end",
-    justifyContent: "flex-end",
+    flexDirection:'row',
+    alignItems: "center",
+    alignContent: "space-between",
+    justifyContent: "space-between",
     marginVertical: 12,
   },
 });
