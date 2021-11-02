@@ -35,20 +35,43 @@ const NecessaryPapers = () => {
       .get()
       .then(querySnapshot => {
         querySnapshot.docs.map(doc => {
-          console.log(doc.data())
+          //console.log(doc.data())
           if(doc.data()?.appealType === declareAppealType && doc.data()?.isStart === 2){
-            if(declareAppealType === 0) navigation.navigate('DoubleMajorAppealFirstScreen', {appealUUID: doc.data()?.appealUUID});
-            else if(declareAppealType === 1) navigation.navigate('VerticalAppealFirstScreen', {appealUUID: doc.data()?.appealUUID});
+            if(declareAppealType === 0) navigation.navigate('DoubleMajorAppealScreen', {appealUUID: doc.data()?.appealUUID});
+            else if(declareAppealType === 1) navigation.navigate('VerticalAppealScreen', {appealUUID: doc.data()?.appealUUID});
+            else if(declareAppealType === 2) navigation.navigate('HorizontalAppealScreen', {appealUUID: doc.data()?.appealUUID});
+            else if(declareAppealType === 3) navigation.navigate('SummerSchoolAppealScreen', {appealUUID: doc.data()?.appealUUID});
+            else if(declareAppealType === 4) navigation.navigate('ClassAdaptationAppealScreen', {appealUUID: doc.data()?.appealUUID});
           }
         })
       })
   }, [])
 
   const clickNextButton = async () => {
+    let startedAppealUUID;
     const appealUUID = uuid.v4();
     const appealType = declareAppealType;
-
     try {
+
+      await firestore().collection('users')
+        .doc(auth().currentUser.uid)
+        .collection('appeals')
+        .get()
+        .then(querySnapshot => {
+          querySnapshot.docs.map(doc => {
+            if(doc.data()?.appealType === appealType && doc.data()?.isStart === 2){
+              startedAppealUUID = doc.data()?.appealUUID;
+            }
+          })
+        })
+        .then(() => {
+          firestore().collection('users')
+            .doc(auth().currentUser.uid)
+            .collection('appeals')
+            .doc(startedAppealUUID)
+            .delete()
+        })
+
       await firestore().collection("users")
         .doc(auth().currentUser.uid)
         .collection("appeals")
@@ -59,11 +82,15 @@ const NecessaryPapers = () => {
           percent: 0,
           files:{}
         }, { merge: true });
-      if(appealType === 0) navigation.navigate('DoubleMajorAppealFirstScreen');
-      else if(appealType === 1) navigation.navigate('VerticalAppealFirstScreen');
+      if(appealType === 0) navigation.navigate('DoubleMajorAppealScreen');
+      else if(appealType === 1) navigation.navigate('VerticalAppealScreen');
+      else if(appealType === 2) navigation.navigate('HorizontalAppealScreen');
+      else if(appealType === 3) navigation.navigate('SummerSchoolAppealScreen');
+      else if(appealType === 4) navigation.navigate('ClassAdaptationAppealScreen');
     }
     catch (e){
-      navigation.navigate('main');
+      console.log(e.message)
+      navigation.goBack();
     }
   };
 

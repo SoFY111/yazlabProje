@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Image, View } from "react-native";
+import { Image, Pressable, View } from "react-native";
 import { Avatar, Button, Subheading, Text, TextInput } from "react-native-paper";
 import { useNavigation } from "@react-navigation/core";
 
@@ -56,7 +56,9 @@ const SignIn = () => {
           onChangeText={(text) => setPassword(text)}
           secureTextEntry
         />
-        <Text style={{marginTop:4, fontSize:12}}>{'şifremi unuttum'.toUpperCase()}</Text>
+        <Pressable onPress={() => navigation.navigate('ForgotPassword')}>
+          <Text style={{marginTop:4, fontSize:12}}>{'şifremi unuttum'.toUpperCase()}</Text>
+        </Pressable>
         <View>
           <Button
             mode="contained"

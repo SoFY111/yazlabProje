@@ -14,7 +14,7 @@ import { Icon } from "react-native-elements";
 import getPath from "@flyerhq/react-native-android-uri-path";
 
 
-const DoubleMajorAppealFirstScreen = () => {
+const DoubleMajorAppealScreen = () => {
   const [fileX, setFileX] = useState([{ name: null, uri: null }]);
   const [fileY, setFileY] = useState([{ name: null, uri: null }]);
   const [fileZ, setFileZ] = useState([{ name: null, uri: null }]);
@@ -37,7 +37,7 @@ const DoubleMajorAppealFirstScreen = () => {
   const [lastAcceptTermsAndConditions, setLastAcceptTermsAndConditions] = useState(false);
   const [percentCounter, setPercentCounter] = useState(0);
   const [userData, setUserData] = useState(null);
-  const [appealUUID, setAppealUUID] = useState(useRoute().params.appealUUID);
+  const [appealUUID, setAppealUUID] = useState(useRoute().params?.appealUUID);
   const navigation = useNavigation()
 
   useEffect(() => {
@@ -833,4 +833,4 @@ const styles = StyleSheet.create({
 });
 
 
-export default DoubleMajorAppealFirstScreen;
+export default DoubleMajorAppealScreen;

@@ -42,6 +42,7 @@ const SignUp = () => {
       });
       await firestore().collection("users").doc(response.user.uid).set({
         studentNumber,
+        email,
         phoneNumber,
         countryIdentifier,
         adres,

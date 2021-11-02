@@ -14,7 +14,7 @@ import { Icon } from "react-native-elements";
 import getPath from "@flyerhq/react-native-android-uri-path";
 
 
-const VerticalAppealFirstScreen = () => {
+const VerticalAppealScreen= () => {
   const [fileX, setFileX] = useState([{ name: null, uri: null }]);
   const [fileY, setFileY] = useState([{ name: null, uri: null }]);
   const [fileZ, setFileZ] = useState([{ name: null, uri: null }]);
@@ -32,7 +32,7 @@ const VerticalAppealFirstScreen = () => {
   const [lastAcceptTermsAndConditions, setLastAcceptTermsAndConditions] = useState(false);
   const [percentCounter, setPercentCounter] = useState(0);
   const [userData, setUserData] = useState(null);
-  const [appealUUID, setAppealUUID] = useState(useRoute().params.appealUUID);
+  const [appealUUID, setAppealUUID] = useState(useRoute().params?.appealUUID);
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -78,10 +78,10 @@ const VerticalAppealFirstScreen = () => {
             setFileF([{ name: querySnapshot.data()?.files?.fileF }]);
             setIsUploadedFileF([{ name: querySnapshot.data()?.files?.fileF }]);
           }
+
         }
       });
   }, []);
-
 
   const docPicker = async (type) => {
     if (type === "x") setFileY([{}]);
@@ -163,7 +163,7 @@ const VerticalAppealFirstScreen = () => {
         .collection("appeals")
         .doc(appealUUID)
         .set({
-          percent: (percentCounter + 1) / 4 * 100,
+          percent: (percentCounter + 1) / 5 * 100,
           files: {
             fileX: fileName,
           },
@@ -181,7 +181,7 @@ const VerticalAppealFirstScreen = () => {
         .collection("appeals")
         .doc(appealUUID)
         .set({
-          percent: (percentCounter + 1) / 4 * 100,
+          percent: (percentCounter + 1) / 5 * 100,
           files: {
             fileY: fileName,
           },
@@ -199,7 +199,7 @@ const VerticalAppealFirstScreen = () => {
         .collection("appeals")
         .doc(appealUUID)
         .set({
-          percent: (percentCounter + 1) / 4 * 100,
+          percent: (percentCounter + 1) / 5 * 100,
           files: {
             fileZ: fileName,
           },
@@ -217,7 +217,7 @@ const VerticalAppealFirstScreen = () => {
         .collection("appeals")
         .doc(appealUUID)
         .set({
-          percent: ((percentCounter + 1) / 4 * 100),
+          percent: ((percentCounter + 1) / 5 * 100),
           files: {
             fileQ: fileName,
           },
@@ -235,12 +235,14 @@ const VerticalAppealFirstScreen = () => {
         .collection("appeals")
         .doc(appealUUID)
         .set({
+          percent: ((percentCounter + 1) / 5 * 100),
           files: {
             fileF: fileName,
           },
         }, { merge: true }).then(() => {
+          setPercentCounter(percentCounter + 1);
           setFileF([{ name: fileName, uri: null }]);
-          setIsUploadedFileQ([{ name: fileName }]);
+          setIsUploadedFileF([{ name: fileName }]);
           setFileUploadedLoader(true);
           setTimeout(() => {
             setFileUploadedLoader(false);
@@ -269,7 +271,7 @@ const VerticalAppealFirstScreen = () => {
                 .collection("appeals")
                 .doc(appealUUID)
                 .set({
-                  percent: (percentCounter - 1) / 4 * 100,
+                  percent: (percentCounter - 1) / 5 * 100,
                   files: {
                     fileX: null,
                   },
@@ -284,7 +286,7 @@ const VerticalAppealFirstScreen = () => {
                 .collection("appeals")
                 .doc(appealUUID)
                 .set({
-                  percent: (percentCounter - 1) / 4 * 100,
+                  percent: (percentCounter - 1) / 5 * 100,
                   files: {
                     fileY: null,
                   },
@@ -299,7 +301,7 @@ const VerticalAppealFirstScreen = () => {
                 .collection("appeals")
                 .doc(appealUUID)
                 .set({
-                  percent: (percentCounter - 1) / 4 * 100,
+                  percent: (percentCounter - 1) / 5 * 100,
                   files: {
                     fileZ: null,
                   },
@@ -314,7 +316,7 @@ const VerticalAppealFirstScreen = () => {
                 .collection("appeals")
                 .doc(appealUUID)
                 .set({
-                  percent: (percentCounter - 1) / 4 * 100,
+                  percent: (percentCounter - 1) / 5 * 100,
                   files: {
                     fileQ: null,
                   },
@@ -329,12 +331,14 @@ const VerticalAppealFirstScreen = () => {
                 .collection("appeals")
                 .doc(appealUUID)
                 .set({
+                  percent: (percentCounter - 1) / 5 * 100,
                   files: {
                     fileF: null,
                   },
                 }, { merge: true }).then(() => {
+                setPercentCounter(percentCounter - 1);
                 setFileF([{ name: null, uri: null }]);
-                setIsUploadedFileQ([{ name: null }]);
+                setIsUploadedFileF([{ name: null }]);
               });
             }
           },
@@ -1015,6 +1019,36 @@ const VerticalAppealFirstScreen = () => {
                     Müfredatı</Text>}
               </TouchableOpacity>
             </View>
+            <View key={4}>
+              <TouchableOpacity
+                style={{
+                  marginTop: 6,
+                  paddingVertical: 8,
+                  paddingLeft: 18,
+                  paddingRight: 12,
+                  borderWidth: 1,
+                  borderColor: "rgba(0,0,0,.3)",
+                  borderRadius: 6,
+                }}
+                onPress={() => docPicker("f")}
+              >
+                {fileF[0].name ? fileF.map(({ name, uri }) => {
+                    return (
+                      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                        <Text>{name.length > 25 ? name.substring(0, 22) + "..." : name}</Text>
+                        <TouchableOpacity style={{ marginLeft: 18 }}
+                                          onPress={() => deleteFile("f", name)}>
+                          <Icon name="close" type="ionicon" />
+                        </TouchableOpacity>
+                        <Button style={{ marginLeft: 4 }} mode="contained"
+                                onPress={async () => await uploadFile("f")}><Text
+                          style={{ color: "#fff" }}>Yükle</Text></Button>
+                      </View>
+                    );
+                  }) :
+                  <Text style={{ paddingHorizontal: 64, paddingVertical: 6, textAlign: "center" }}>Mezuniyet Belgesi</Text>}
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
 
@@ -1082,4 +1116,4 @@ const styles = StyleSheet.create({
 });
 
 
-export default VerticalAppealFirstScreen;
+export default VerticalAppealScreen;

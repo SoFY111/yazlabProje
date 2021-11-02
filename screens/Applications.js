@@ -10,9 +10,7 @@ import { useNavigation } from "@react-navigation/core";
 import { useDispatch, useSelector } from "react-redux";
 
 const Application = () => {
-
-  const [appeals, setAppeals] = useState();
-  var appealsArr = [];
+  const [appeals, setAppeals] = useState([]);
   const [email, setEmail] = useState("");
   const navigation = useNavigation();
 
@@ -30,37 +28,38 @@ const Application = () => {
   }, []);
 
   useEffect(() => {
-    firestore()
-      .collection("users")
+    firestore().collection('users')
       .doc(auth().currentUser.uid)
-      .collection("appeals")
-      .onSnapshot(querySnapshot => {
-        querySnapshot.forEach(doc => {
-          appealsArr.push({
-            appealUUID: doc.data().appealUUID,
-            appealType: doc.data().appealType,
-            isStart: doc.data().isStart,
-          });
-        });
-      });
-  }, []);
+      .collection('appeals')
+      .where('isStart', '==', 2)
+      .onSnapshot(docs => {
+        let appealss = [];
+        docs.forEach(doc => {
+          appealss.push(doc.data())
+        })
+        setAppeals( appealss )
+      })
+    }, []);
 
   return (
     <View style={{ flex: 1, padding: 16 }}>
       <View style={{ paddingBottom: 14, borderBottomWidth: 1, borderBottomColor: "rgba(0,0,0,.2)" }}>
-        <Text>Devam Eden Başvurular</Text>
-        <Button onPress={() => console.log(appealsArr)}>asd</Button>
-        <View>
-
-          <>
-            {!appealsArr && appealsArr.map((appeal) => (
-              <Text key={appeal.appealUUID}>{appeal.appealUUID}asd</Text>
-            ))}
-          </>
-          <Text>Başvuru 2</Text>
-          <Text>Başvuru 3</Text>
-          <Text>Başvuru 4</Text>
-          <Text>Başvuru 5</Text>
+        <Text style={{fontSize:16}}>{'Devam Eden Başvurular'.toLocaleUpperCase()}</Text>
+        <View style={{marginTop:6}}>
+          {appeals.length > 0 ? appeals.map(appeal => (
+            <View key={appeal.appealUUID} style={{flexDirection: "column", marginLeft:6, marginTop:2}}>
+              <Text>{appeal.appealType === 0 ? 'ÇAP Başvuru' : appeal.appealType === 1 ? 'DGS Başvuru' : appeal.appealType === 2 ? 'Yatay Geçiş Başvuru' : appeal.appealType === 3 ? 'Yaz Okulu Başvuru' : 'Ders İntibak Başvuru'}</Text>
+              {appeal.percent === 0 ? <Text style={{fontSize:10}}>%{appeal.percent}</Text> :
+                appeal.percent === 100 ?
+                  <View style={{width: `${appeal.percent}%`, backgroundColor:'#5AA658', alignItems:"center", borderRadius:4}}>
+                    <Text style={{fontSize:10, paddingRight: 6, color:'#fff'}}>Başvuruyu Tamamla</Text>
+                  </View> :
+                  <View style={{width: `${appeal.percent}%`, backgroundColor:'#5AA658', alignItems:"flex-end", borderRadius:4}}>
+                    <Text style={{fontSize:10, paddingRight: 6, color:'#fff'}}>%{appeal.percent}</Text>
+                  </View>
+              }
+            </View>
+          )) : <Text style={{marginLeft:6, marginTop:2, fontSize:14, color: 'red'}}>Yarım kalan başvurunuz bulunmamaktadır.</Text>}
         </View>
       </View>
 
