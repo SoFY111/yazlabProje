@@ -72,7 +72,7 @@ const NecessaryPapers = () => {
             .delete()
         })
 
-      await firestore().collection("users")
+      const response = await firestore().collection("users")
         .doc(auth().currentUser.uid)
         .collection("appeals")
         .doc(appealUUID).set({
@@ -80,13 +80,14 @@ const NecessaryPapers = () => {
           appealType,
           isStart: 2,
           percent: 0,
-          files:{}
+          files:{},
+          createdAt: Date.now()
         }, { merge: true });
-      if(appealType === 0) navigation.navigate('DoubleMajorAppealScreen');
-      else if(appealType === 1) navigation.navigate('VerticalAppealScreen');
-      else if(appealType === 2) navigation.navigate('HorizontalAppealScreen');
-      else if(appealType === 3) navigation.navigate('SummerSchoolAppealScreen');
-      else if(appealType === 4) navigation.navigate('ClassAdaptationAppealScreen');
+      if(appealType === 0) navigation.navigate('DoubleMajorAppealScreen', {appealUUID: appealUUID});
+      else if(appealType === 1) navigation.navigate('VerticalAppealScreen', {appealUUID: appealUUID});
+      else if(appealType === 2) navigation.navigate('HorizontalAppealScreen', {appealUUID: appealUUID});
+      else if(appealType === 3) navigation.navigate('SummerSchoolAppealScreen', {appealUUID: appealUUID});
+      else if(appealType === 4) navigation.navigate('ClassAdaptationAppealScreen', {appealUUID: appealUUID});
     }
     catch (e){
       console.log(e.message)

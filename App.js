@@ -88,14 +88,13 @@ const App = () => {
   const [isUserAdmin, setIsUserAdmin] = useState(false)
 
   useEffect(() => {
-
     firestore().collection('users')
       .doc(auth()?.currentUser?.uid)
       .onSnapshot(doc => {
         doc.data()?.type === 1 ? setIsUserAdmin(true) : setIsUserAdmin(false)
       })
       console.log('isAdmin:' + isUserAdmin)
-  }, [])
+  }, [isSignedIn])
 
   console.log(isSignedIn);
   return (

@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Platform, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Button, Subheading, TextInput, useTheme } from "react-native-paper";
 import { useNavigation } from "@react-navigation/core";
 
@@ -11,8 +11,14 @@ import auth from "@react-native-firebase/auth";
 import firestore from "@react-native-firebase/firestore";
 import { useDispatch } from "react-redux";
 import { userAuthChange } from "../redux/actions/isUserSignedInAction";
+import { Icon } from "react-native-elements";
+import DocumentPicker from "react-native-document-picker";
+import storage from "@react-native-firebase/storage";
+import getPath from "@flyerhq/react-native-android-uri-path";
 
 const SignUp = () => {
+  const [fileX, setFileX] = useState([{ name: null, uri: null }])
+  const [isUploadedFileX, setIsUploadedFileX] = useState([{ name: null, uri: null }]);
   const [studentNumber, setStudentNumber] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -23,15 +29,48 @@ const SignUp = () => {
   const [adres, setAdres] = useState("");
   const [ogrSinif, setOgrSinif] = useState("");
   const [isPickerShow, setIsPickerShow] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date(-631152000000));
+  const [selectedDate, setSelectedDate] = useState(new Date(1640908800));
   const [faculty, setFaculty] = useState("");
   const [departmant, setDepartmant] = useState("");
+
+  const [faculties, setFaculties] = useState([])
+  const [departmans, setDepartmans] = useState([])
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
   const navigation = useNavigation();
   const dispatch = useDispatch()
+
+  useEffect(() => {
+    firestore().collection('faculties')
+      .onSnapshot((docs) => {
+        let facultiess = []
+        docs.forEach(doc => {
+          facultiess.push({
+            uid: doc.id,
+            name:  doc.data().name
+          })
+        })
+        setFaculties(facultiess)
+      })
+  }, [])
+
+  useEffect(() => {
+    firestore().collection('faculties')
+      .doc(faculty)
+      .collection('departmans')
+      .onSnapshot(docs => {
+        let departmanss = []
+        docs.forEach(doc => {
+          departmanss.push({
+            uid: doc.id,
+            name: doc.data().name
+          })
+        })
+        setDepartmans(departmanss)
+      })
+  }, [faculty])
 
   const createAccount = async () => {
     setIsLoading(true);
@@ -41,6 +80,7 @@ const SignUp = () => {
         displayName: name,
       });
       await firestore().collection("users").doc(response.user.uid).set({
+        name,
         studentNumber,
         email,
         phoneNumber,
@@ -49,8 +89,13 @@ const SignUp = () => {
         ogrSinif,
         faculty,
         departmant,
+        profilePhoto: null,
         type: 0
       });
+
+      await firestore().collection('users').doc(response.user.uid).collection('appeals').doc('deneme').set({deneme: 'deneme'})
+      await firestore().collection('users').doc(response.user.uid).collection('appeals').doc('deneme').delete()
+      if(fileX[0].name !== null) await uploadFile('x', studentNumber, name, response.user.uid)
       setIsLoading(false);
       await auth().signInWithEmailAndPassword(email, password);
       dispatch(userAuthChange())
@@ -85,6 +130,83 @@ const SignUp = () => {
     console.log(selectedDate);
   };
 
+  const docPicker = async () => {
+    setFileX([{}]);
+
+    // Pick a single file
+    try {
+      const res = await DocumentPicker.pick({
+        /*by using allFiles type, you will able to pick any type of media from user device,
+        There can me more options as well
+        DocumentPicker.types.images: All image types
+        DocumentPicker.types.plainText: Plain text files
+        DocumentPicker.types.audio: All audio types
+        DocumentPicker.types.pdf: PDF documents
+        DocumentPicker.types.zip: Zip files
+        DocumentPicker.types.csv: Csv files
+        DocumentPicker.types.doc: doc files
+        DocumentPicker.types.docx: docx files
+        DocumentPicker.types.ppt: ppt files
+        DocumentPicker.types.pptx: pptx files
+        DocumentPicker.types.xls: xls files
+        DocumentPicker.types.xlsx: xlsx files
+        For selecting more more than one options use the
+        type: [DocumentPicker.types.csv,DocumentPicker.types.xls]*/
+        type: [DocumentPicker.types.images],
+      });
+
+      setFileX([{ name: res[0].name, uri: res[0].uri }]);
+
+    } catch (err) {
+      if (DocumentPicker.isCancel(err)) {
+        console.log("error -----", err);
+      } else {
+        throw err;
+      }
+    }
+  };
+
+  const deleteFile = async () => {
+    try {
+      setFileX([{ name: null, uri: null }]);
+    } catch (e) {
+      console.log(e.message);
+    }
+  };
+
+  const uploadFile = async (type, studentNumber, displayName, userId) => {
+    let file = fileX[0];
+
+    let fileName = file.name;
+    const fileUri = getPath(file.uri);
+    const extension = fileName.split(".").pop();
+    const name = fileName.split(".").slice(0, -1).join(".");
+
+    fileName = studentNumber + "_"
+      + displayName.replace(" ", "-") + "_"
+      + userId + "_"
+      + Date.now() + "."
+      + extension;
+
+
+    let task = storage().ref("images/userProfilePicture/" + fileName).putFile(fileUri);
+
+
+    try {
+      await task;
+      await firestore().collection("users")
+        .doc(auth().currentUser.uid)
+        .set({
+            profilePhoto: fileName,
+        }, { merge: true }).then(() => {
+          setFileX([{ name: fileName, uri: null }]);
+          setIsUploadedFileX([{ name: fileName }]);
+        });
+    } catch (e) {
+      console.log(e.message);
+    }
+  };
+
   return (
     <ScrollView>
       <View style={{ margin: 16 }}>
@@ -92,21 +214,21 @@ const SignUp = () => {
           <Subheading style={{ color: "red", textAlign: "center", marginBottom: 16 }}>{error}</Subheading>
         )}
 
-        <TextInput
+        <TextInput key={0}
           label="Öğrenci Numarası"
           value={studentNumber}
           onChangeText={(text) => setStudentNumber(text)}
           keyboardType="numeric"
         />
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-          <TextInput
+          <TextInput key={1}
             label="Şifre"
             style={{ width: "45%", marginTop: 12 }}
             value={password}
             onChangeText={(text) => setPassword(text)}
             secureTextEntry
           />
-          <TextInput
+          <TextInput key={2}
             label="Şifre Tekrar"
             style={{ width: "50%", marginTop: 12 }}
             value={passwordAgain}
@@ -114,21 +236,21 @@ const SignUp = () => {
             secureTextEntry
           />
         </View>
-        <TextInput
+        <TextInput key={3}
           label="Email"
           style={{ marginTop: 12 }}
           value={email}
           onChangeText={(text) => setEmail(text)}
           keyboardType="email-address"
         />
-        <TextInput
+        <TextInput key={4}
           label="Ad Soyad"
           style={{ marginTop: 12 }}
           value={name}
           onChangeText={(text) => setName(text)}
         />
 
-        <TextInput
+        <TextInput key={5}
           style={{ marginTop: 18 }}
           label=""
           render={props =>
@@ -143,8 +265,7 @@ const SignUp = () => {
           }
         />
 
-
-        <TextInput
+        <TextInput key={6}
           label="TC Kimlik No"
           style={{ marginTop: 18 }}
           value={countryIdentifier}
@@ -152,13 +273,13 @@ const SignUp = () => {
           keyboardType="numeric"
           maxLength={11}
         />
-        <TextInput
+        <TextInput key={7}
           label="Adres"
           style={{ marginTop: 12 }}
           value={adres}
           onChangeText={(text) => setAdres(text)}
         />
-        <SelectPicker
+        <SelectPicker key={8}
           style={styles.list}
           onValueChange={(value) => setOgrSinif(value) }
           selected={ogrSinif}
@@ -175,13 +296,13 @@ const SignUp = () => {
           <Pressable onPress={() => showPicker()}>
             <View>
               <TextInput style={{ marginTop: 12 }} disabled
-                         label={selectedDate.getTime() !== -631152000000 ? (selectedDate.getDate() + "/" + (selectedDate.getMonth() + 1) + "/" + selectedDate.getFullYear()) : "Doğum Tarihi Seçiniz.."} />
+                         label={selectedDate.getTime() !== 1640908800 ? (selectedDate.getDate() + "/" + (selectedDate.getMonth() + 1) + "/" + selectedDate.getFullYear()) : "Doğum Tarihi Seçiniz.."} />
             </View>
           </Pressable>
 
           {/* The date picker */}
           {isPickerShow && (
-            <DateTimePicker
+            <DateTimePicker key={9}
               value={selectedDate}
               mode={"date"}
               is24Hour={true}
@@ -192,29 +313,55 @@ const SignUp = () => {
           )}
         </View>
 
-        <SelectPicker
+        <SelectPicker key={10}
           style={styles.list}
           onValueChange={(value) => setFaculty(value)}
           selected={faculty}
           placeholder="Fakülte"
         >
-          <SelectPicker.Item label="1" value="1" key="1" />
-          <SelectPicker.Item label="2" value="2" key="2" />
-          <SelectPicker.Item label="3" value="3" key="3" />
-          <SelectPicker.Item label="4" value="4" key="4" />
+          {faculties.map((faculty) => (
+            <SelectPicker.Item label={faculty.name} value={faculty.uid} key={faculty.uid} />
+          ))}
         </SelectPicker>
 
-        <SelectPicker
+        <SelectPicker key={11}
           style={styles.list}
           onValueChange={(value) => setDepartmant(value)}
           selected={departmant}
           placeholder="Bölüm"
         >
-          <SelectPicker.Item label="1" value="1" key="1" />
-          <SelectPicker.Item label="2" value="2" key="2" />
-          <SelectPicker.Item label="3" value="3" key="3" />
-          <SelectPicker.Item label="4" value="4" key="4" />
+          {departmans.map(departman => (
+            <SelectPicker.Item label={departman.name} value={departman.uid} key={departman.uid} />
+          ))}
         </SelectPicker>
+
+        <View key={12}>
+          <TouchableOpacity
+            style={{
+              marginTop: 6,
+              paddingVertical: 8,
+              paddingLeft: 18,
+              paddingRight: 12,
+              borderWidth: 1,
+              borderColor: "rgba(0,0,0,.3)",
+              borderRadius: 6,
+            }}
+            onPress={() => docPicker()}
+          >
+            {fileX[0].name ? fileX.map(({ name, uri }) => {
+                return (
+                  <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                    <Text>{name.length > 25 ? name.substring(0, 22) + "..." : name}</Text>
+                    <TouchableOpacity style={{ marginLeft: 18 }}
+                                      onPress={() => deleteFile()}>
+                      <Icon name="close" type="ionicon" />
+                    </TouchableOpacity>
+                  </View>
+                );
+              }) :
+              <Text style={{ paddingHorizontal: 64, paddingVertical: 6, textAlign: "center" }}>Profil Fotoğrafı</Text>}
+          </TouchableOpacity>
+        </View>
 
         <View style={{
           flexDirection: "row",
