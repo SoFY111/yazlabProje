@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Avatar, Button, Dialog, Portal, Subheading, TextInput, Title } from "react-native-paper";
 import auth from "@react-native-firebase/auth";
 import { useDispatch } from "react-redux";
@@ -8,6 +8,8 @@ import firestore from "@react-native-firebase/firestore";
 import storage from "@react-native-firebase/storage";
 import { Icon } from "react-native-elements";
 import PhoneInput from "react-native-phone-input/dist";
+import getPath from "@flyerhq/react-native-android-uri-path";
+import DocumentPicker from "react-native-document-picker";
 
 
 const Settings = () => {
@@ -18,6 +20,9 @@ const Settings = () => {
     auth().signOut();
     dispatch(userAuthChange());
   };
+
+  const [fileX, setFileX] = useState([{name: null, uri: null}])
+  const [fileUploadedLoader ,setFileUploadedLoader] = useState(false)
   const [userUID, setUserUID] = useState();
   const [userData, setUserData] = useState([]);
   const [email, setEmail] = useState("");
@@ -25,6 +30,8 @@ const Settings = () => {
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [isEdit, setIsEdit] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [userFaculty, setUserFaculty] = useState('')
+  const [userDepartmant, setUserDepartmant] = useState('')
 
   const [newName, setNewName] = useState("");
   const [newStudentNumber, setNewStudentNumber] = useState("");
@@ -70,12 +77,162 @@ const Settings = () => {
 
 
   const updateData = async () => {
-    if (isEdit === "name") console.log(newName);
-    if (isEdit === "studentNumber") console.log(newStudentNumber);
-    if (isEdit === "countryIdentifier") console.log(newCountryIdentifier);
-    if (isEdit === "adres") console.log(newAdres);
-    if (isEdit === "phoneNumber") console.log(newPhoneNumber);
+    setIsLoading(true)
+    if (isEdit === "name") {
+      try {
+        await firestore().collection('users')
+          .doc(auth().currentUser.uid)
+          .set({
+            name: newName
+          }, {merge: true})
+      }catch (e) {
+        console.log(e.message)
+      }
+    }
+    else if (isEdit === "studentNumber") {
+      try {
+        await firestore().collection('users')
+          .doc(auth().currentUser.uid)
+          .set({
+            studentNumber: newStudentNumber
+          }, {merge: true})
+      }catch (e) {
+        console.log(e.message)
+      }
+
+    }
+    else if (isEdit === "countryIdentifier") {
+      try {
+        await firestore().collection('users')
+          .doc(auth().currentUser.uid)
+          .set({
+            countryIdentifier: newCountryIdentifier
+          }, {merge: true})
+      }catch (e) {
+        console.log(e.message)
+      }
+
+    }
+    else if (isEdit === "adres") {
+      try {
+        await firestore().collection('users')
+          .doc(auth().currentUser.uid)
+          .set({
+            adres: newAdres
+          }, {merge: true})
+      }catch (e) {
+        console.log(e.message)
+      }
+
+    }
+    else if (isEdit === "phoneNumber") {
+      try {
+        await firestore().collection('users')
+          .doc(auth().currentUser.uid)
+          .set({
+            phoneNumber: newPhoneNumber
+          }, {merge: true})
+
+      }catch (e) {
+        console.log(e.message)
+      }
+
+    }
+    setIsDialogVisible(false)
+    setIsLoading(false)
   };
+
+  const deleteProfilePhoto = async () => {
+    try{
+      await firestore().collection('users')
+        .doc(auth().currentUser.uid)
+        .set({
+          profilePhoto: null
+        }, {merge: true})
+      await storage().ref("/images/userProfilePicture/" + userData?.profilePhoto).delete();
+    }catch (e){
+      console.log(e.message)
+    }
+  }
+
+  const docPicker = async () => {
+    setFileX([{}]);
+
+    // Pick a single file
+    try {
+      const res = await DocumentPicker.pick({
+        /*by using allFiles type, you will able to pick any type of media from user device,
+        There can me more options as well
+        DocumentPicker.types.images: All image types
+        DocumentPicker.types.plainText: Plain text files
+        DocumentPicker.types.audio: All audio types
+        DocumentPicker.types.pdf: PDF documents
+        DocumentPicker.types.zip: Zip files
+        DocumentPicker.types.csv: Csv files
+        DocumentPicker.types.doc: doc files
+        DocumentPicker.types.docx: docx files
+        DocumentPicker.types.ppt: ppt files
+        DocumentPicker.types.pptx: pptx files
+        DocumentPicker.types.xls: xls files
+        DocumentPicker.types.xlsx: xlsx files
+        For selecting more more than one options use the
+        type: [DocumentPicker.types.csv,DocumentPicker.types.xls]*/
+        type: [DocumentPicker.types.images],
+      });
+
+      setFileX([{ name: res[0].name, uri: res[0].uri }]);
+
+    } catch (err) {
+      if (DocumentPicker.isCancel(err)) {
+        console.log("error -----", err);
+      } else {
+        throw err;
+      }
+    }
+  };
+
+
+  const uploadFile = async (type) => {
+    let file;
+
+    if (type === "x") file = fileX[0];
+
+    let fileName = file.name;
+    const fileUri = getPath(file.uri);
+    const extension = fileName.split(".").pop();
+    const name = fileName.split(".").slice(0, -1).join(".");
+
+    fileName = userData.studentNumber + "_"
+      + auth().currentUser.displayName.replace(" ", "-") + "_"
+      + auth().currentUser.uid + "_"
+      + Date.now() + "."
+      + extension;
+
+    let task = storage().ref("images/userProfilePicture/" + fileName).putFile(fileUri);
+
+    try {
+      await task;
+      if (type === "x") await firestore().collection("users")
+        .doc(auth().currentUser.uid)
+        .set({
+          profilePhoto: fileName
+        }, { merge: true }).then(() => {
+          setFileX([{ name: fileName, uri: null }]);
+          setFileUploadedLoader(true);
+          setTimeout(() => {
+            setFileUploadedLoader(false);
+          }, 2000);
+        });
+    } catch (e) {
+      console.log(e.message);
+    }
+  };
+
+
+  const deleteFile = async (type, fileName) => {
+    setFileX({name: null, uri: null})
+  };
+
 
   return (
     <View style={{ alignItems: "center", marginTop: 16 }}>
@@ -89,12 +246,30 @@ const Settings = () => {
           </View>
         }
         <View style={styles.container}>
-          <Button compact onPress={() => console.log("x")} disabled={userData?.profilePhoto === null}>
+          <Button compact onPress={() => deleteProfilePhoto()} disabled={userData?.profilePhoto === null}>
             <Text>Fotoğrafı Kaldır</Text>
           </Button>
-          <Button compact style={{ marginLeft: 4 }} onPress={() => console.log("+")}>
-            <Text>Yeni Fotoğrafı Seç</Text>
-          </Button>
+            <TouchableOpacity
+              onPress={() => docPicker("x")}
+            >
+              {fileX[0]?.name ? fileX.map(({ name, uri }) => {
+                  return (
+                    <View style={{ flexDirection: "column", alignItems: "center", justifyContent: "space-between" }}>
+                      <Text>{name.length > 25 ? name.substring(0, 22) + "..." : name}</Text>
+                      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                        <TouchableOpacity style={{ marginLeft: 18 }}
+                                          onPress={() => deleteFile("x", name)}>
+                          <Icon name="close" type="ionicon" />
+                        </TouchableOpacity>
+                        <Button style={{ marginLeft: 4 }} mode="contained"
+                                onPress={async () => await uploadFile("x")}><Text
+                          style={{ color: "#fff" }}>Yükle</Text></Button>
+                      </View>
+                    </View>
+                  );
+                }) :
+                <Text style={{ textAlign: "center" }}>{'Yeni Fotoğraf Seç'.toLocaleUpperCase()}</Text>}
+            </TouchableOpacity>
         </View>
 
         <View style={styles.container}>
@@ -142,7 +317,7 @@ const Settings = () => {
         </View>
 
         <View style={styles.container}>
-          <Text>{'userData?.phoneNumber.phoneInputValue'}</Text>
+          <Text>{userData?.phoneNumber?.phoneInputValue}</Text>
           <Pressable onPress={() => {
             setIsDialogVisible(true);
             setIsEdit("phoneNumber");
@@ -199,7 +374,7 @@ const Settings = () => {
                                    initialCountry={"tr"}
                                    onChangePhoneNumber={onPhoneInputChange}
                                    textProps={{
-                                     placeholder: 'userData?.phoneNumber.phoneInputValue',
+                                     placeholder: userData?.phoneNumber?.phoneInputValue.substr(3, userData?.phoneNumber?.phoneInputValue.length),
                                    }}
                                  />
                                }
