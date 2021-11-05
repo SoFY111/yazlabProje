@@ -6,11 +6,17 @@
  * @flow strict-local
  */
 
+/*
+* https://github.com/vinzscam/react-native-file-viewer/issues/109 => .pdf görüntülümek için
+* */
+
 import React, { useEffect, useState } from "react";
+/* https://callstack.github.io/react-native-paper/index.html -> paperUI kaynak kodları*/
 import { DefaultTheme, Provider as PaperProvider } from "react-native-paper";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+/* https://reactnativeelements.com/docs/icon/ -> icon pakedi*/
 import { Icon } from "react-native-elements";
 
 import SignIn from "./screens/SignIn";
@@ -20,6 +26,7 @@ import Applications from "./screens/Applications";
 import AllAppeal from "./screens/AllAppeal";
 import StudentAppealDetail from "./screens/StudentAppealDetail";
 import AdminScreen from "./screens/AdminScreen";
+import ForgotPassword from "./screens/appealScreens/ForgotPassword";
 
 import AppealDetail from "./screens/AppealDetail";
 import DoubleMajorAppealScreen from "./screens/appealScreens/DoubleMajorAppeal/DoubleMajorAppealScreen";
@@ -32,9 +39,9 @@ import NecessaryPapers from "./screens/NecessaryPapers";
 
 import { useSelector } from "react-redux";
 
+/* https://rnfirebase.io/ => firebase eklentisi için*/
 import auth from "@react-native-firebase/auth";
 import firestore from "@react-native-firebase/firestore";
-import ForgotPassword from "./screens/appealScreens/ForgotPassword";
 
 const theme = {
   ...DefaultTheme,
@@ -119,6 +126,10 @@ const App = () => {
   }, [isSignedIn]);
 
   console.log(isSignedIn);
+  /*
+  * https://reactnavigation.org/docs/auth-flow/
+  * bottom-bat oluşturmak için
+  * */
   return (
     <PaperProvider theme={theme}>
       <NavigationContainer>
@@ -140,9 +151,12 @@ const App = () => {
             }} />
           </Stack.Navigator>
           :
+
           <Tabs.Navigator options={{ headerShown: false }} screenOptions={({ route }) => ({
+            /* https://reactnativeelements.com/docs/icon/ => bottomBar'da ki iconların çalışması için gerkeli */
             tabBarIcon: ({ focused, color, size }) => {
               return <Icon
+
                 name={route.name === "Başvurular" ? "albums" : route.name === "Başvuru Yap" ? "add" : route.name === "Admin" ? "settings" : "person"}
                 type="ionicon" color={color}
                 size={size} />;

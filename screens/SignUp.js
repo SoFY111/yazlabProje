@@ -72,6 +72,10 @@ const SignUp = () => {
       });
   }, [faculty]);
 
+  /*
+  * https://stackoverflow.com/questions/48541270/how-to-add-document-with-custom-id-to-firestore
+  * firestore'a veri eklemek için
+  * */
   const createAccount = async () => {
     setIsLoading(true);
     try { /*try catch ekle eğer collection eklenmezse user'ı sil*/
@@ -279,6 +283,7 @@ const SignUp = () => {
                    value={adres}
                    onChangeText={(text) => setAdres(text)}
         />
+
         <SelectPicker key={8}
                       style={styles.list}
                       onValueChange={(value) => setOgrSinif(value)}

@@ -86,6 +86,10 @@ const AppealDetail = () => {
     }
   };
 
+  /*
+  * https://github.com/vinzscam/react-native-file-viewer
+  * .pdf açmak için gerekli
+  * */
   const openPdf = (fileURL, fileName) => {
     const localFile = `${RNFS.DocumentDirectoryPath}/${fileName}`;
 

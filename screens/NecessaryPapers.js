@@ -22,6 +22,10 @@ const NecessaryPapers = () => {
   * */
 
 
+  /*
+  *  https://reactnavigation.org/docs/params/
+  * sayfadan sayfaya parametre olarak veri aktarmak için
+  * */
   const navigation = useNavigation();
   const declareAppealType = useRoute().params.type; //Başvuru tipini tanımla (0, 1, 2, 3, 4 durumu .app.config.txt dosyasında belirtildi)
 

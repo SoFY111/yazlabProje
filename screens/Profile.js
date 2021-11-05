@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Avatar, Button, Dialog, Portal, Subheading, TextInput, Title } from "react-native-paper";
-import auth from "@react-native-firebase/auth";
-import { useDispatch } from "react-redux";
-import { userAuthChange } from "../redux/actions/isUserSignedInAction";
-import firestore from "@react-native-firebase/firestore";
-import storage from "@react-native-firebase/storage";
 import { Icon } from "react-native-elements";
+
 import PhoneInput from "react-native-phone-input/dist";
 import getPath from "@flyerhq/react-native-android-uri-path";
 import DocumentPicker from "react-native-document-picker";
 
+import auth from "@react-native-firebase/auth";
+import storage from "@react-native-firebase/storage";
+import firestore from "@react-native-firebase/firestore";
+
+import { userAuthChange } from "../redux/actions/isUserSignedInAction";
+import { useDispatch } from "react-redux";
 
 const Settings = () => {
 
@@ -150,7 +152,10 @@ const Settings = () => {
       //console.log(e.message)
     }
   };
-
+  /*
+  * https://github.com/rnmods/react-native-document-picker
+  * dosya seçmek için
+  * */
   const docPicker = async () => {
     setFileX([{}]);
 

@@ -84,7 +84,11 @@ const AllAppeal = () => {
   return (
     <View style={{ paddingVertical: 6 }}>
       <View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+
+        {/*https://stackoverflow.com/questions/43987917/hide-scrollbar-in-flatlist-react-native-in-android
+          scrollview'ın yatay'da kaymasını sağlar
+          */ }
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <Button compact mode="contained" style={{ backgroundColor: "#FFC107" }} onPress={() => getWaitingAppeal()}>
             <Text style={{ color: "#fff" }}>Bekleyen Başvurular</Text>
           </Button>

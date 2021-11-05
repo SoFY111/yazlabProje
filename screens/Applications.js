@@ -16,13 +16,24 @@ const Application = () => {
   const navigation = useNavigation();
   const [isUserAdmin, setIsUserAdmin] = useState(false);
 
+
+  /*
+  *   https://mesqueeb.github.io/vuex-easy-firestore/add-and-manage-data.html#collection-mode
+  *   https://redux.js.org/tutorials/fundamentals/part-5-ui-react#dispatching-actions-with-usedispatch
+  *   redux yapısı ile bütün uygulamada okunup değiştirilebilen değişkinler oluşturmak için
+  * */
   const isSignedIn = useSelector((state) => state.isUserSignedIn);
   const dispatch = useDispatch();
 
+  /* https://tr.reactjs.org/docs/hooks-effect.html -> useEffect kullanımı*/
   useEffect(() => {
     if (!isSignedIn) navigation.navigate("SignIn");
   }, []);
 
+  /*
+  * https://firebase.google.com/docs/firestore/query-data/listen
+  * firestore'dan veri çekmek için
+  * */
   useEffect(() => {
     firestore().collection("users")
       .doc(auth().currentUser.uid)
