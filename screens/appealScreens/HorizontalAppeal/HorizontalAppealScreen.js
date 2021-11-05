@@ -35,7 +35,7 @@ const HorizontalAppealScreen = () => {
   const [percentCounter, setPercentCounter] = useState(0);
   const [userData, setUserData] = useState(null);
   const [appealUUID, setAppealUUID] = useState(useRoute().params?.appealUUID);
-  const navigation = useNavigation()
+  const navigation = useNavigation();
 
   useEffect(() => {
 
@@ -159,13 +159,13 @@ const HorizontalAppealScreen = () => {
         .collection("appeals")
         .doc(appealUUID)
         .set({
-          percent: (percentCounter+1)/4*100,
+          percent: (percentCounter + 1) / 4 * 100,
           files: {
             fileX: fileName,
           },
         }, { merge: true }).then(() => {
-          setPercentCounter(percentCounter + 1)
-          setFileXisLoading(false)
+          setPercentCounter(percentCounter + 1);
+          setFileXisLoading(false);
           setFileX([{ name: fileName, uri: null }]);
           setIsUploadedFileX([{ name: fileName }]);
           setFileUploadedLoader(true);
@@ -178,13 +178,13 @@ const HorizontalAppealScreen = () => {
         .collection("appeals")
         .doc(appealUUID)
         .set({
-          percent: (percentCounter+1)/4*100,
+          percent: (percentCounter + 1) / 4 * 100,
           files: {
             fileY: fileName,
           },
         }, { merge: true }).then(() => {
-          setPercentCounter(percentCounter + 1)
-          setFileYisLoading(false)
+          setPercentCounter(percentCounter + 1);
+          setFileYisLoading(false);
           setFileY([{ name: fileName, uri: null }]);
           setIsUploadedFileY([{ name: fileName }]);
           setFileUploadedLoader(true);
@@ -197,13 +197,13 @@ const HorizontalAppealScreen = () => {
         .collection("appeals")
         .doc(appealUUID)
         .set({
-          percent: (percentCounter+1)/4*100,
+          percent: (percentCounter + 1) / 4 * 100,
           files: {
             fileZ: fileName,
           },
         }, { merge: true }).then(() => {
-          setPercentCounter(percentCounter + 1)
-          setFileZisLoading(false)
+          setPercentCounter(percentCounter + 1);
+          setFileZisLoading(false);
           setFileZ([{ name: fileName, uri: null }]);
           setIsUploadedFileZ([{ name: fileName }]);
           setFileUploadedLoader(true);
@@ -216,13 +216,13 @@ const HorizontalAppealScreen = () => {
         .collection("appeals")
         .doc(appealUUID)
         .set({
-          percent: ((percentCounter+1)/4*100),
+          percent: ((percentCounter + 1) / 4 * 100),
           files: {
             fileQ: fileName,
           },
         }, { merge: true }).then(() => {
-          setPercentCounter(percentCounter + 1)
-          setFileQisLoading(false)
+          setPercentCounter(percentCounter + 1);
+          setFileQisLoading(false);
           setFileQ([{ name: fileName, uri: null }]);
           setIsUploadedFileQ([{ name: fileName }]);
           setFileUploadedLoader(true);
@@ -253,7 +253,7 @@ const HorizontalAppealScreen = () => {
                 .collection("appeals")
                 .doc(appealUUID)
                 .set({
-                  percent: (percentCounter - 1)/4*100,
+                  percent: (percentCounter - 1) / 4 * 100,
                   files: {
                     fileX: null,
                   },
@@ -268,7 +268,7 @@ const HorizontalAppealScreen = () => {
                 .collection("appeals")
                 .doc(appealUUID)
                 .set({
-                  percent: (percentCounter - 1)/4*100,
+                  percent: (percentCounter - 1) / 4 * 100,
                   files: {
                     fileY: null,
                   },
@@ -283,7 +283,7 @@ const HorizontalAppealScreen = () => {
                 .collection("appeals")
                 .doc(appealUUID)
                 .set({
-                  percent: (percentCounter - 1)/4*100,
+                  percent: (percentCounter - 1) / 4 * 100,
                   files: {
                     fileZ: null,
                   },
@@ -298,7 +298,7 @@ const HorizontalAppealScreen = () => {
                 .collection("appeals")
                 .doc(appealUUID)
                 .set({
-                  percent: (percentCounter - 1)/4*100,
+                  percent: (percentCounter - 1) / 4 * 100,
                   files: {
                     fileQ: null,
                   },
@@ -322,45 +322,89 @@ const HorizontalAppealScreen = () => {
 
   const finishAppeal = async () => {
     try {
-      await firestore().collection('users')
+      await firestore().collection("users")
         .doc(auth().currentUser.uid)
-        .collection('appeals')
+        .collection("appeals")
         .doc(appealUUID)
         .set({
           isStart: 1,
-          percent: 100
-        }, {merge: true})
+          percent: 100,
+        }, { merge: true });
+
+      await firestore().collection("adminAppeals")
+        .doc(appealUUID)
+        .set({
+          isStart: 1,
+        }, { merge: true });
+    } catch (e) {
+      console.log(e.message);
     }
-    catch (e) {
-      console.log(e.message)
-    }
-    navigation.navigate('Applications')
-  }
+    navigation.navigate("Applications");
+  };
 
   return (
     <View style={styles.container}>
       <ScrollView style={styles.scv}>
         <Text>
-          Kocaeli Üniversitesi Başarıya Dayalı ve Merkezi Puan (Ek Madde-1) ile Kurum İçi ve Kurumlar Arası Yatay Geçiş Başvurularına İlişkin Usul ve Esaslar
+          Kocaeli Üniversitesi Başarıya Dayalı ve Merkezi Puan (Ek Madde-1) ile Kurum İçi ve Kurumlar Arası Yatay
+          Geçiş Başvurularına İlişkin Usul ve Esaslar
           (02.07.2018 tarihli senato toplantısında kabul edilmiştir.)
-          Bu Usul ve Esaslar, Yükseköğretim Kurumlarında önlisans ve lisans düzeyindeki programlar arasında geçiş, çift anadal, yan dal ile kurumlar arası kredi transferi yapılması esaslarına ilişkin yönetmeliğin 7 nci maddesinin ikinci fıkrası ve Ek Madde 1’e dayanılarak hazırlanmıştır.
-          1-) Disiplin cezası alan öğrenciler başarıya dayalı yatay geçiş yapamazlar. Disiplin cezası almadıklarını başvuru sırasında belgelemeleri şarttır. Merkezi puanla (EK Madde-1) yatay geçiş yapacak olan öğrencilerin disiplin cezası alıp almadıklarına bakılmaz.
-          2-) Tamamen/kısmen yabancı dil ile eğitim yapan veya öğretim dili Türkçe olan bölümden/ programdan, tamamen veya kısmen yabancı dil ile eğitim yapan bölümlere/programlara başarıya dayalı veya merkezi puanla (Ek Madde-1) kurum içi veya kurumlar arası yatay geçiş yapacak öğrencilerin başvuru sırasında; geldiği yükseköğretim kurumunda almış olduğu zorunlu veya isteğe bağlı yabancı dil hazırlık eğitimini başarmış olduklarını belgelemeleri veya Üniversitemiz tarafından yapılacak olan yabancı dil yeterlik sınavını başarmaları veya ulusal veya uluslararası geçerliliği olan yabancı dil sınavlarından aşağıdaki minimum puanları almış olduklarını belgelemeleri şarttır. Ancak, merkezi puanla (Ek Madde-1) hazırlık ve birinci sınıfa yatay geçiş yapacak öğrencilerin, Üniversitemiz tarafından yapılacak olan yabancı dil yeterlik sınavını başaramamaları veya ulusal/uluslararası geçerliliği olan yabancı dil sınavlarından minimum puanları almış olduklarını belgeleyememeleri durumunda, yatay geçiş sonrasında Üniversitemizde yabancı dil hazırlık eğitimi almaları zorunludur.
+          Bu Usul ve Esaslar, Yükseköğretim Kurumlarında önlisans ve lisans düzeyindeki programlar arasında
+          geçiş, çift anadal, yan dal ile kurumlar arası kredi transferi yapılması esaslarına ilişkin yönetmeliğin
+          7 nci maddesinin ikinci fıkrası ve Ek Madde 1’e dayanılarak hazırlanmıştır.
+          1-) Disiplin cezası alan öğrenciler başarıya dayalı yatay geçiş yapamazlar. Disiplin cezası almadıklarını
+          başvuru sırasında belgelemeleri şarttır. Merkezi puanla (EK Madde-1) yatay geçiş yapacak olan
+          öğrencilerin disiplin cezası alıp almadıklarına bakılmaz.
+          2-) Tamamen/kısmen yabancı dil ile eğitim yapan veya öğretim dili Türkçe olan bölümden/ programdan,
+          tamamen veya kısmen yabancı dil ile eğitim yapan bölümlere/programlara başarıya dayalı veya merkezi puanla
+          (Ek Madde-1) kurum içi veya kurumlar arası yatay geçiş yapacak öğrencilerin başvuru sırasında; geldiği
+          yükseköğretim kurumunda almış olduğu zorunlu veya isteğe bağlı yabancı dil hazırlık eğitimini
+          başarmış olduklarını belgelemeleri veya Üniversitemiz tarafından yapılacak olan yabancı dil yeterlik
+          sınavını başarmaları veya ulusal veya uluslararası geçerliliği olan yabancı dil sınavlarından aşağıdaki
+          minimum puanları almış olduklarını belgelemeleri şarttır. Ancak, merkezi puanla (Ek Madde-1) hazırlık ve
+          birinci sınıfa yatay geçiş yapacak öğrencilerin, Üniversitemiz tarafından yapılacak olan yabancı dil
+          yeterlik sınavını başaramamaları veya ulusal/uluslararası geçerliliği olan yabancı dil sınavlarından
+          minimum puanları almış olduklarını belgeleyememeleri durumunda, yatay geçiş sonrasında Üniversitemizde
+          yabancı dil hazırlık eğitimi almaları zorunludur.
           Sınav Adı: KPDS,ÜDS,YDS,YÖKDİL TOEFL iBT
           PTE Akademik
           Minimum Puan: 50/100
           60/120 45/90
-          3-) Tamamen veya kısmen yabancı dil ile eğitim yapan bölümden/programdan, merkezi puanla (Ek Madde-1) tamamen veya kısmen yabancı dil ile eğitim yapan bölüme/programa yatay geçiş hakkı kazanan, ancak geldiği yükseköğretim kurumunda yabancı dil hazırlık eğitiminde bir yıl başarısız olmuş öğrenciler için merkezi puanla (Ek Madde-1) yatay geçişten sonra en fazla bir yıl yabancı dil hazırlık eğitim hakkı daha verilir. Geldiği yükseköğretim kurumunda yabancı dil hazırlık eğitiminde iki yıl başarısız olmuş öğrencilerin, başvurusu kabul edilmez.
-          4-) Başarıya dayalı kurum içi veya kurumlar arası yatay geçiş için, öğrencinin kayıt dondurduğu yarıyıl/yarıyıllar hariç olmak üzere, geçiş yapacağı yarıyıla kadar ders planında yer alan tüm derslerini almış ve başarmış olması ile birlikte ağırlıklı genel not ortalamasının (AGNO) 100 üzerinden en az 70 olması şarttır. Başvuruda bulunan öğrencilerin başarı sıralaması;
+          3-) Tamamen veya kısmen yabancı dil ile eğitim yapan bölümden/programdan, merkezi puanla (Ek Madde-1)
+          tamamen veya kısmen yabancı dil ile eğitim yapan bölüme/programa yatay geçiş hakkı kazanan, ancak
+          geldiği yükseköğretim kurumunda yabancı dil hazırlık eğitiminde bir yıl başarısız olmuş öğrenciler
+          için merkezi puanla (Ek Madde-1) yatay geçişten sonra en fazla bir yıl yabancı dil hazırlık eğitim hakkı
+          daha verilir. Geldiği yükseköğretim kurumunda yabancı dil hazırlık eğitiminde iki yıl başarısız olmuş
+          öğrencilerin, başvurusu kabul edilmez.
+          4-) Başarıya dayalı kurum içi veya kurumlar arası yatay geçiş için, öğrencinin kayıt dondurduğu
+          yarıyıl/yarıyıllar hariç olmak üzere, geçiş yapacağı yarıyıla kadar ders planında yer alan tüm
+          derslerini almış ve başarmış olması ile birlikte ağırlıklı genel not ortalamasının (AGNO) 100 üzerinden
+          en az 70 olması şarttır. Başvuruda bulunan öğrencilerin başarı sıralaması;
           (Ağırlıklı genel not ortalaması x 0,4) + (ÖSYM yerleştirme puanı x 0,6)
-          formülüne göre yapılır. 4’lük ve 100’lük not dönüşümünde YÖK not dönüşüm tablosu kullanılır. Yurtdışı yatay geçiş kontenjanlarına başvuran öğrencilerin değerlendirilmesi sadece AGNO’ya göre yapılır.
-          5-) Bir yükseköğretim kurumuna yerleştirilen önlisans öğrencileri yerleştirildikleri programda bir yarıyıl, lisans öğrencileri bir yıl öğrenim gördükten sonra, merkezi puanla (EK Madde-1) Üniversitemiz bölümlerine/programlarına kurum içi veya kurumlar arası yatay geçiş başvurusu yapabilir. Geldiği Yükseköğretim Kurumunda bir yarıyıl/yıl tamamlamamış olan öğrencilerin başvurusu kabul edilmez.
-          6-) Kurum içi veya kurumlar arası, başarıya dayalı veya Ek Madde-1 kapsamındaki tüm yatay geçiş türlerinde, öğrenci geldiği Yükseköğretim Kurumu/Bölümü/Programı’nda tamamlamış olduğu aktif dönemin/yılın bir sonraki dönemi/yılı için açılmış olan kontenjana başvurabilir. Kayıt hakkı kazanan öğrencinin kaydı ve ders planı ataması, başvuru yaptığı dönem/yıl için yapılır. Örneğin; geldiği Yükseköğretim Kurumunda ikinci sınıfı tamamlamış bir lisans öğrencisi, üçüncü sınıf kontenjanına başvurabilir, kayıt hakkı kazanması halinde üçüncü sınıfa kaydı yapılır ve üçüncü sınıf ders planına tabi olur.
-          7-) Merkezi puan (Ek Madde 1) kapsamında yapılan başvuruların değerlendirilmesinde yapılacak başarı sıralaması;
+          formülüne göre yapılır. 4’lük ve 100’lük not dönüşümünde YÖK not dönüşüm tablosu kullanılır.
+          Yurtdışı yatay geçiş kontenjanlarına başvuran öğrencilerin değerlendirilmesi sadece AGNO’ya göre
+          yapılır.
+          5-) Bir yükseköğretim kurumuna yerleştirilen önlisans öğrencileri yerleştirildikleri programda bir
+          yarıyıl, lisans öğrencileri bir yıl öğrenim gördükten sonra, merkezi puanla (EK Madde-1) Üniversitemiz
+          bölümlerine/programlarına kurum içi veya kurumlar arası yatay geçiş başvurusu yapabilir. Geldiği
+          Yükseköğretim Kurumunda bir yarıyıl/yıl tamamlamamış olan öğrencilerin başvurusu kabul edilmez.
+          6-) Kurum içi veya kurumlar arası, başarıya dayalı veya Ek Madde-1 kapsamındaki tüm yatay geçiş
+          türlerinde, öğrenci geldiği Yükseköğretim Kurumu/Bölümü/Programı’nda tamamlamış olduğu aktif
+          dönemin/yılın bir sonraki dönemi/yılı için açılmış olan kontenjana başvurabilir. Kayıt hakkı kazanan
+          öğrencinin kaydı ve ders planı ataması, başvuru yaptığı dönem/yıl için yapılır. Örneğin; geldiği
+          Yükseköğretim Kurumunda ikinci sınıfı tamamlamış bir lisans öğrencisi, üçüncü sınıf kontenjanına
+          başvurabilir, kayıt hakkı kazanması halinde üçüncü sınıfa kaydı yapılır ve üçüncü sınıf ders planına
+          tabi olur.
+          7-) Merkezi puan (Ek Madde 1) kapsamında yapılan başvuruların değerlendirilmesinde yapılacak başarı
+          sıralaması;
           [(Adayın ÖSYM puanı - Bölüm ÖSYM taban puanı) x 100] / Bölüm ÖSYM taban puanı
           formülüne göre yapılır.
-          8-) Başvuru değerlendirme sonuçlarına itiraz, sonuçların ilanından sonraki ilk iki iş günü içerisinde mesai saatlerinde, ilgili bölüm/program başkanlıklarına yapılır.
-          9-) 24 Nisan 2010 tarih ve 27561 sayılı Resmi Gazete’de yayımlanarak yürürlüğe giren “Yükseköğretim Kurumlarında Önlisans ve Lisans Düzeyindeki Programlar Arasında Geçiş, Çift Anadal, Yan Dal İle Kurumlar Arası Kredi Transferi Yapılması Esaslarına İlişkin Yönetmelik” ten önce kullanılmakta olan “Kocaeli Üniversitesi Önlisans ve Lisans Öğretimi Yatay Geçiş Yönergesi” yürürlükten kaldırılmıştır.
+          8-) Başvuru değerlendirme sonuçlarına itiraz, sonuçların ilanından sonraki ilk iki iş günü içerisinde
+          mesai saatlerinde, ilgili bölüm/program başkanlıklarına yapılır.
+          9-) 24 Nisan 2010 tarih ve 27561 sayılı Resmi Gazete’de yayımlanarak yürürlüğe giren “Yükseköğretim
+          Kurumlarında Önlisans ve Lisans Düzeyindeki Programlar Arasında Geçiş, Çift Anadal, Yan Dal İle Kurumlar
+          Arası Kredi Transferi Yapılması Esaslarına İlişkin Yönetmelik” ten önce kullanılmakta olan “Kocaeli
+          Üniversitesi Önlisans ve Lisans Öğretimi Yatay Geçiş Yönergesi” yürürlükten kaldırılmıştır.
         </Text>
       </ScrollView>
       <View>
@@ -410,7 +454,8 @@ const HorizontalAppealScreen = () => {
                         style={{ color: "#fff" }}>Yükle</Text></Button>
                     </View>
                   );
-                }) : <Text style={{ paddingHorizontal: 64, paddingVertical: 6, textAlign: "center" }}>Ders İçerikleri</Text>}
+                }) : <Text style={{ paddingHorizontal: 64, paddingVertical: 6, textAlign: "center" }}>Ders
+                  İçerikleri</Text>}
               </TouchableOpacity>
             </View>
             <View key={1}>
@@ -436,13 +481,14 @@ const HorizontalAppealScreen = () => {
                       </TouchableOpacity>
                       <Button style={{ marginLeft: 4 }} mode="contained" loading={fileYisLoading}
                               onPress={async () => {
-                                setFileYisLoading(true)
+                                setFileYisLoading(true);
                                 await uploadFile("y");
                               }}><Text
                         style={{ color: "#fff" }}>Yükle</Text></Button>
                     </View>
                   );
-                }) : <Text style={{ paddingHorizontal: 64, paddingVertical: 6, textAlign: "center" }}>Ders Planı Müfredatı</Text>}
+                }) : <Text style={{ paddingHorizontal: 64, paddingVertical: 6, textAlign: "center" }}>Ders Planı
+                  Müfredatı</Text>}
               </TouchableOpacity>
             </View>
             <View key={2}>
@@ -468,7 +514,7 @@ const HorizontalAppealScreen = () => {
                       </TouchableOpacity>
                       <Button style={{ marginLeft: 4 }} mode="contained" loading={fileZisLoading}
                               onPress={async () => {
-                                setFileZisLoading(true)
+                                setFileZisLoading(true);
                                 await uploadFile("z");
                               }}><Text
                         style={{ color: "#fff" }}>Yükle</Text></Button>
@@ -500,14 +546,15 @@ const HorizontalAppealScreen = () => {
                         </TouchableOpacity>
                         <Button style={{ marginLeft: 4 }} mode="contained" loading={fileQisLoading}
                                 onPress={async () => {
-                                  setFileQisLoading(true)
+                                  setFileQisLoading(true);
                                   await uploadFile("q");
                                 }}><Text
                           style={{ color: "#fff" }}>Yükle</Text></Button>
                       </View>
                     );
                   }) :
-                  <Text style={{ paddingHorizontal: 64, paddingVertical: 6, textAlign: "center" }}>ÖSYM Sonuç Belgesi</Text>}
+                  <Text style={{ paddingHorizontal: 64, paddingVertical: 6, textAlign: "center" }}>ÖSYM Sonuç
+                    Belgesi</Text>}
               </TouchableOpacity>
             </View>
           </View>
@@ -562,9 +609,9 @@ const styles = StyleSheet.create({
   scv: {
     flex: 1,
     borderWidth: 1,
-    borderColor: 'rgba(0,0,0, .2)',
-    borderRadius:4,
-    padding:8,
+    borderColor: "rgba(0,0,0, .2)",
+    borderRadius: 4,
+    padding: 8,
   },
   nextButtonContainer: {
     flexDirection: "row",

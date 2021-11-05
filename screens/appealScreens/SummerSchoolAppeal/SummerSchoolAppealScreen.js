@@ -35,7 +35,7 @@ const SummerSchoolAppealScreen = () => {
   const [percentCounter, setPercentCounter] = useState(0);
   const [userData, setUserData] = useState(null);
   const [appealUUID, setAppealUUID] = useState(useRoute().params?.appealUUID);
-  const navigation = useNavigation()
+  const navigation = useNavigation();
 
   useEffect(() => {
 
@@ -159,13 +159,13 @@ const SummerSchoolAppealScreen = () => {
         .collection("appeals")
         .doc(appealUUID)
         .set({
-          percent: (percentCounter+1)/4*100,
+          percent: (percentCounter + 1) / 4 * 100,
           files: {
             fileX: fileName,
           },
         }, { merge: true }).then(() => {
-          setPercentCounter(percentCounter + 1)
-          setFileXisLoading(false)
+          setPercentCounter(percentCounter + 1);
+          setFileXisLoading(false);
           setFileX([{ name: fileName, uri: null }]);
           setIsUploadedFileX([{ name: fileName }]);
           setFileUploadedLoader(true);
@@ -178,13 +178,13 @@ const SummerSchoolAppealScreen = () => {
         .collection("appeals")
         .doc(appealUUID)
         .set({
-          percent: (percentCounter+1)/4*100,
+          percent: (percentCounter + 1) / 4 * 100,
           files: {
             fileY: fileName,
           },
         }, { merge: true }).then(() => {
-          setPercentCounter(percentCounter + 1)
-          setFileYisLoading(false)
+          setPercentCounter(percentCounter + 1);
+          setFileYisLoading(false);
           setFileY([{ name: fileName, uri: null }]);
           setIsUploadedFileY([{ name: fileName }]);
           setFileUploadedLoader(true);
@@ -197,13 +197,13 @@ const SummerSchoolAppealScreen = () => {
         .collection("appeals")
         .doc(appealUUID)
         .set({
-          percent: (percentCounter+1)/4*100,
+          percent: (percentCounter + 1) / 4 * 100,
           files: {
             fileZ: fileName,
           },
         }, { merge: true }).then(() => {
-          setPercentCounter(percentCounter + 1)
-          setFileZisLoading(false)
+          setPercentCounter(percentCounter + 1);
+          setFileZisLoading(false);
           setFileZ([{ name: fileName, uri: null }]);
           setIsUploadedFileZ([{ name: fileName }]);
           setFileUploadedLoader(true);
@@ -216,13 +216,13 @@ const SummerSchoolAppealScreen = () => {
         .collection("appeals")
         .doc(appealUUID)
         .set({
-          percent: ((percentCounter+1)/4*100),
+          percent: ((percentCounter + 1) / 4 * 100),
           files: {
             fileQ: fileName,
           },
         }, { merge: true }).then(() => {
-          setPercentCounter(percentCounter + 1)
-          setFileQisLoading(false)
+          setPercentCounter(percentCounter + 1);
+          setFileQisLoading(false);
           setFileQ([{ name: fileName, uri: null }]);
           setIsUploadedFileQ([{ name: fileName }]);
           setFileUploadedLoader(true);
@@ -253,7 +253,7 @@ const SummerSchoolAppealScreen = () => {
                 .collection("appeals")
                 .doc(appealUUID)
                 .set({
-                  percent: (percentCounter - 1)/4*100,
+                  percent: (percentCounter - 1) / 4 * 100,
                   files: {
                     fileX: null,
                   },
@@ -268,7 +268,7 @@ const SummerSchoolAppealScreen = () => {
                 .collection("appeals")
                 .doc(appealUUID)
                 .set({
-                  percent: (percentCounter - 1)/4*100,
+                  percent: (percentCounter - 1) / 4 * 100,
                   files: {
                     fileY: null,
                   },
@@ -283,7 +283,7 @@ const SummerSchoolAppealScreen = () => {
                 .collection("appeals")
                 .doc(appealUUID)
                 .set({
-                  percent: (percentCounter - 1)/4*100,
+                  percent: (percentCounter - 1) / 4 * 100,
                   files: {
                     fileZ: null,
                   },
@@ -298,7 +298,7 @@ const SummerSchoolAppealScreen = () => {
                 .collection("appeals")
                 .doc(appealUUID)
                 .set({
-                  percent: (percentCounter - 1)/4*100,
+                  percent: (percentCounter - 1) / 4 * 100,
                   files: {
                     fileQ: null,
                   },
@@ -322,39 +322,70 @@ const SummerSchoolAppealScreen = () => {
 
   const finishAppeal = async () => {
     try {
-      await firestore().collection('users')
+      await firestore().collection("users")
         .doc(auth().currentUser.uid)
-        .collection('appeals')
+        .collection("appeals")
         .doc(appealUUID)
         .set({
           isStart: 1,
-          percent: 100
-        }, {merge: true})
+          percent: 100,
+        }, { merge: true });
+
+      await firestore().collection("adminAppeals")
+        .doc(appealUUID)
+        .set({
+          isStart: 1,
+        }, { merge: true });
+    } catch (e) {
+      console.log(e.message);
     }
-    catch (e) {
-      console.log(e.message)
-    }
-    navigation.navigate('Applications')
-  }
+    navigation.navigate("Applications");
+  };
 
   return (
     <View style={styles.container}>
       <ScrollView style={styles.scv}>
         <Text>
-          Bu esaslar; Üniversitemiz öğencilerinin, diğer yükseköğretim kurumlarında verilen yaz öğretimi derslerinin alınmasına ilişkin hususları kapsar.
-          ESAS 1- (1) Spor Biliınleri Fakültesi dışındaki tüm akademik birimlerde okuyan öğrencilerin, diğer yükseköğretim kurumlarından yaz öğretiminde ders alabilmeleri içinı Üniversiteye giriş yılı esas olmak üzere ilgili bölüm/program taban puanın en fazla 40 puan düşük olma koşulu aranır.
-          (2) Spor Bilimleri Fakültesi öğencilerinin diğer üniversitelerin Yaz Okulundan ders almalarında puan şartı aranmaz.
-          (3) Yaz okulunda diğer yükseköğretim kurumlarından alınacak dersler için yaz öğretimi dersleri başlamadan önce öğrencinin kayıt|ı olduğu ilgili birimin Bölüm/Anabilim Dalı veya Program Başkanlığının onayı gerekir.
-          (4) Yaz okulunda Bölüm/Anabilim Dalı veya Program Başkanlığı bu konudaki değerlendirmesini; ilgili bölüm müfredatındaki benzer içeriğe veya program yeıerliliğine sahip olmakla birlikte, dersin AKTS/kredi/saat değerinden herhangi birini dikkate alarak yapar.
-          ESAS 2- (l) Öğrenciler, yaz öğretiminde denlerin AKTS/kredi/saat değerlerine bakılmaksızın, en çok 3 ders alabilir.
-          ESAS 3- ( l ) Güz veiveya bahar yarıyıllarında kayıt donduran öğrenciler, kayıt dondurdukları yarıyıllara ilişkin dersleri yaz öğretiıninde alamazlar.
-          f,SAS 4- (l) Öğrenci, alt yarıyı|lara ait hiç almadığı, alıp da sınavına girme hakkı elde edemediği veya alıp da başarısız kaldığı dersleri, yaz öğretiminde alabilir. Ağırlıklı Genel Not Ortalaması (AGNO) 3.00 ve üzerinde olan ve herhangi bir ders başarısı (DC) harfnofundan düşük olmayan bir öğrenci üst yarıyıllara ait dersleri yaz öğretiminde alabilir.
-          ESAS 5- (l) Yaz öğretimi kapsamında a|ınan ders(ler)in notu muaf/yeterli/başarılı ibaresi ile ifade edilmiş ise; öğrencinin bu notu sayısal puan olarak belgelendirmesi halinde, o notun karştlığı Üniversitemiz sistemine dönüştürülür: belgelend irememesi durumunda ise o derslere Üniversitemiz not sisıemindeki CC harf nolu verilir.
-          ESAS 6-(l)Yaz öğretimi kapsamında alınan her bir dersin notu AGNO'ya bakılmaksızın, 4'lük sistem üzerinden 2.00'ın altında ise öğrencinin bu dersten aldığı notun katsayısı Üniversitemizde uygulanmakta olan ilgili aralıktaki harf notuna dönüştürülerek başarısız sayılır.
-          ESAS 7-(l)Yaz öğretimi kapsamında alınan bir dersin notu 4'lük sistem üzerinden 2.00 ve üzerinde ise bu dersin başarı notu katsayısı Üniversilemizde uygulanmakta olan ilgili aralıktaki harfnotuna dönüştürülerek başarılı sayılır.
-          ESAS 8- (l) Öğrencilerin sınıf başarı sıralaması, bahar yarıyılı sonunda alınan notlar iIe belirlenir. Akademik yılda ilk % l0'a giren öğrencilerin belirlenmesinde yaz öğretiminde alınan derslerin başarı notları dikkate alınmaz.
-          ESAS 9- (1) Yaz öğretimi aynı öğretim yılına ait üçüncii bir yarıyı| değildir. Yaz öğretiminde alınan ders(ler)in notları, öğrenciIerin güz ve bahar yarıyıllarındaki yarıyıl not ortalamalarını etkileınez. Ancak, öğrencinin AGNO hesaplanmasına d6hil edilir. Yaz öğretiminde alınan bir dersten sağlanan devam şartı, öğrencinin tabii olduğu ders planında eş|eşme yapılan ders için tekrar aranmaz.
-          ESAS 10- (l) Yaz öğretimi sonunda mezuniyetine tek dersi kalan öğrencilere tek ders sınav hakkı verilir. Bu sınav akademik takvimde belirtilen tarihte yapılır.
+          Bu esaslar; Üniversitemiz öğencilerinin, diğer yükseköğretim kurumlarında verilen yaz öğretimi
+          derslerinin alınmasına ilişkin hususları kapsar.
+          ESAS 1- (1) Spor Biliınleri Fakültesi dışındaki tüm akademik birimlerde okuyan öğrencilerin, diğer
+          yükseköğretim kurumlarından yaz öğretiminde ders alabilmeleri içinı Üniversiteye giriş yılı esas olmak
+          üzere ilgili bölüm/program taban puanın en fazla 40 puan düşük olma koşulu aranır.
+          (2) Spor Bilimleri Fakültesi öğencilerinin diğer üniversitelerin Yaz Okulundan ders almalarında puan
+          şartı aranmaz.
+          (3) Yaz okulunda diğer yükseköğretim kurumlarından alınacak dersler için yaz öğretimi dersleri
+          başlamadan önce öğrencinin kayıt|ı olduğu ilgili birimin Bölüm/Anabilim Dalı veya Program
+          Başkanlığının onayı gerekir.
+          (4) Yaz okulunda Bölüm/Anabilim Dalı veya Program Başkanlığı bu konudaki değerlendirmesini; ilgili
+          bölüm müfredatındaki benzer içeriğe veya program yeıerliliğine sahip olmakla birlikte, dersin
+          AKTS/kredi/saat değerinden herhangi birini dikkate alarak yapar.
+          ESAS 2- (l) Öğrenciler, yaz öğretiminde denlerin AKTS/kredi/saat değerlerine bakılmaksızın, en çok 3
+          ders alabilir.
+          ESAS 3- ( l ) Güz veiveya bahar yarıyıllarında kayıt donduran öğrenciler, kayıt dondurdukları yarıyıllara
+          ilişkin dersleri yaz öğretiıninde alamazlar.
+          f,SAS 4- (l) Öğrenci, alt yarıyı|lara ait hiç almadığı, alıp da sınavına girme hakkı elde edemediği veya
+          alıp da başarısız kaldığı dersleri, yaz öğretiminde alabilir. Ağırlıklı Genel Not Ortalaması (AGNO) 3.00
+          ve üzerinde olan ve herhangi bir ders başarısı (DC) harfnofundan düşük olmayan bir öğrenci üst
+          yarıyıllara ait dersleri yaz öğretiminde alabilir.
+          ESAS 5- (l) Yaz öğretimi kapsamında a|ınan ders(ler)in notu muaf/yeterli/başarılı ibaresi ile ifade
+          edilmiş ise; öğrencinin bu notu sayısal puan olarak belgelendirmesi halinde, o notun karştlığı
+          Üniversitemiz sistemine dönüştürülür: belgelend irememesi durumunda ise o derslere Üniversitemiz not
+          sisıemindeki CC harf nolu verilir.
+          ESAS 6-(l)Yaz öğretimi kapsamında alınan her bir dersin notu AGNO'ya bakılmaksızın, 4'lük sistem üzerinden
+          2.00'ın altında ise öğrencinin bu dersten aldığı notun katsayısı Üniversitemizde uygulanmakta olan ilgili
+          aralıktaki harf notuna dönüştürülerek başarısız sayılır.
+          ESAS 7-(l)Yaz öğretimi kapsamında alınan bir dersin notu 4'lük sistem üzerinden 2.00 ve üzerinde ise bu
+          dersin başarı notu katsayısı Üniversilemizde uygulanmakta olan ilgili aralıktaki harfnotuna
+          dönüştürülerek başarılı sayılır.
+          ESAS 8- (l) Öğrencilerin sınıf başarı sıralaması, bahar yarıyılı sonunda alınan notlar iIe belirlenir.
+          Akademik yılda ilk % l0'a giren öğrencilerin belirlenmesinde yaz öğretiminde alınan derslerin başarı
+          notları dikkate alınmaz.
+          ESAS 9- (1) Yaz öğretimi aynı öğretim yılına ait üçüncii bir yarıyı| değildir. Yaz öğretiminde
+          alınan ders(ler)in notları, öğrenciIerin güz ve bahar yarıyıllarındaki yarıyıl not ortalamalarını
+          etkileınez. Ancak, öğrencinin AGNO hesaplanmasına d6hil edilir. Yaz öğretiminde alınan bir dersten
+          sağlanan devam şartı, öğrencinin tabii olduğu ders planında eş|eşme yapılan ders için tekrar aranmaz.
+          ESAS 10- (l) Yaz öğretimi sonunda mezuniyetine tek dersi kalan öğrencilere tek ders sınav hakkı verilir.
+          Bu sınav akademik takvimde belirtilen tarihte yapılır.
           Bu esaslar, 06i l l/20l9 tarihli Senato onayı ile yürürlüğe girmiştir.
         </Text>
       </ScrollView>
@@ -388,9 +419,10 @@ const SummerSchoolAppealScreen = () => {
                 }}
                 onPress={() => docPicker("x")}
               >
-                {fileX[0].name ? fileX.map(({index, name, uri }) => {
+                {fileX[0].name ? fileX.map(({ index, name, uri }) => {
                   return (
-                    <View key={index} style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                    <View key={index}
+                          style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                       <Text>{name.length > 25 ? name.substring(0, 22) + "..." : name}</Text>
                       <TouchableOpacity style={{ marginLeft: 18 }}
                                         onPress={() => deleteFile("x", name)}>
@@ -405,7 +437,8 @@ const SummerSchoolAppealScreen = () => {
                         style={{ color: "#fff" }}>Yükle</Text></Button>
                     </View>
                   );
-                }) : <Text style={{ paddingHorizontal: 64, paddingVertical: 6, textAlign: "center" }}>Yaz Okulu Ders Dilekçesi</Text>}
+                }) : <Text style={{ paddingHorizontal: 64, paddingVertical: 6, textAlign: "center" }}>Yaz Okulu Ders
+                  Dilekçesi</Text>}
               </TouchableOpacity>
             </View>
             <View key={1}>
@@ -421,9 +454,10 @@ const SummerSchoolAppealScreen = () => {
                 }}
                 onPress={() => docPicker("y")}
               >
-                {fileY[0].name ? fileY.map(({index, name, uri }) => {
+                {fileY[0].name ? fileY.map(({ index, name, uri }) => {
                   return (
-                    <View key={index} style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                    <View key={index}
+                          style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                       <Text>{name.length > 25 ? name.substring(0, 22) + "..." : name}</Text>
                       <TouchableOpacity style={{ marginLeft: 18 }}
                                         onPress={() => deleteFile("y", name)}>
@@ -431,13 +465,14 @@ const SummerSchoolAppealScreen = () => {
                       </TouchableOpacity>
                       <Button style={{ marginLeft: 4 }} mode="contained" loading={fileYisLoading}
                               onPress={async () => {
-                                setFileYisLoading(true)
+                                setFileYisLoading(true);
                                 await uploadFile("y");
                               }}><Text
                         style={{ color: "#fff" }}>Yükle</Text></Button>
                     </View>
                   );
-                }) : <Text style={{ paddingHorizontal: 64, paddingVertical: 6, textAlign: "center" }}>Okul Taban Puanları</Text>}
+                }) : <Text style={{ paddingHorizontal: 64, paddingVertical: 6, textAlign: "center" }}>Okul Taban
+                  Puanları</Text>}
               </TouchableOpacity>
             </View>
             <View key={2}>
@@ -453,9 +488,10 @@ const SummerSchoolAppealScreen = () => {
                 }}
                 onPress={() => docPicker("z")}
               >
-                {fileZ[0].name ? fileZ.map(({index,  name, uri }) => {
+                {fileZ[0].name ? fileZ.map(({ index, name, uri }) => {
                   return (
-                    <View key={index} style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                    <View key={index}
+                          style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                       <Text>{name.length > 25 ? name.substring(0, 22) + "..." : name}</Text>
                       <TouchableOpacity style={{ marginLeft: 18 }}
                                         onPress={() => deleteFile("z", name)}>
@@ -463,7 +499,7 @@ const SummerSchoolAppealScreen = () => {
                       </TouchableOpacity>
                       <Button style={{ marginLeft: 4 }} mode="contained" loading={fileZisLoading}
                               onPress={async () => {
-                                setFileZisLoading(true)
+                                setFileZisLoading(true);
                                 await uploadFile("z");
                               }}><Text
                         style={{ color: "#fff" }}>Yükle</Text></Button>
@@ -485,9 +521,10 @@ const SummerSchoolAppealScreen = () => {
                 }}
                 onPress={() => docPicker("q")}
               >
-                {fileQ[0].name ? fileQ.map(({index, name, uri }) => {
+                {fileQ[0].name ? fileQ.map(({ index, name, uri }) => {
                     return (
-                      <View key={index} style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                      <View key={index}
+                            style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                         <Text>{name.length > 25 ? name.substring(0, 22) + "..." : name}</Text>
                         <TouchableOpacity style={{ marginLeft: 18 }}
                                           onPress={() => deleteFile("q", name)}>
@@ -495,14 +532,15 @@ const SummerSchoolAppealScreen = () => {
                         </TouchableOpacity>
                         <Button style={{ marginLeft: 4 }} mode="contained" loading={fileQisLoading}
                                 onPress={async () => {
-                                  setFileQisLoading(true)
+                                  setFileQisLoading(true);
                                   await uploadFile("q");
                                 }}><Text
                           style={{ color: "#fff" }}>Yükle</Text></Button>
                       </View>
                     );
                   }) :
-                  <Text style={{ paddingHorizontal: 64, paddingVertical: 6, textAlign: "center" }}>Ders İçerikleri</Text>}
+                  <Text style={{ paddingHorizontal: 64, paddingVertical: 6, textAlign: "center" }}>Ders
+                    İçerikleri</Text>}
               </TouchableOpacity>
             </View>
           </View>
@@ -557,9 +595,9 @@ const styles = StyleSheet.create({
   scv: {
     flex: 1,
     borderWidth: 1,
-    borderColor: 'rgba(0,0,0, .2)',
-    borderRadius:4,
-    padding:8,
+    borderColor: "rgba(0,0,0, .2)",
+    borderRadius: 4,
+    padding: 8,
   },
   nextButtonContainer: {
     flexDirection: "row",

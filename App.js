@@ -19,6 +19,9 @@ import SignIn from "./screens/SignIn";
 import SignUp from "./screens/SignUp";
 import Profile from "./screens/Profile";
 import Applications from "./screens/Applications";
+import AllAppeal from "./screens/AllAppeal"
+import StudentAppealDetail from "./screens/StudentAppealDetail";
+import AdminScreen from "./screens/AdminScreen";
 
 import AppealDetail from "./screens/AppealDetail";
 import DoubleMajorAppealScreen from "./screens/appealScreens/DoubleMajorAppeal/DoubleMajorAppealScreen";
@@ -53,7 +56,7 @@ const ApplicationStackScreen = () => {
   return (
     <ApplicationStack.Navigator>
       <ApplicationStack.Screen name="Applications" component={Applications}
-                           options={{ title: "BAŞVURULAR", headerTitleAlign: "center" }} />
+                           options={{ title: "BAŞVURU YAP", headerTitleAlign: "center" }} />
       <ApplicationStack.Screen name="AppealDetail" component={AppealDetail} options={{title:'Başvuru Detayları', headerTitleAlign:'center'}}/>
       <ApplicationStack.Screen name="NecessaryPapers" component={NecessaryPapers} options={{title:'Gerekli Evraklar', headerTitleAlign:'center'}}/>
       <ApplicationStack.Screen name="DoubleMajorAppealScreen" component={DoubleMajorAppealScreen} options={{title:'Çap Başvuru', headerTitleAlign:'center'}}/>
@@ -75,12 +78,23 @@ const ProfileStackScreen = () => {
   );
 };
 
+const AllAppealsStack = createNativeStackNavigator();
+const AllAppealsStackScreen = () => {
+  return (
+    <AllAppealsStack.Navigator>
+      <AllAppealsStack.Screen name="AllAppealScreen" component={AllAppeal}
+                           options={{ title: "BAŞVURULAR", headerTitleAlign: "center" }} />
+      <ApplicationStack.Screen name="StudentAppealDetail" component={StudentAppealDetail} options={{title:'Başvuru Detayları', headerTitleAlign:'center'}}/>
+    </AllAppealsStack.Navigator>
+  );
+};
+
 const AdminStack = createNativeStackNavigator();
 const AdminStackScreen = () => {
   return (
     <AdminStack.Navigator>
-      <AdminStack.Screen name="AdminStackScreen" component={Profile}
-                           options={{ title: "ADMIN", headerTitleAlign: "center" }} />
+      <AdminStack.Screen name="AllAppealScreen" component={AdminScreen}
+                           options={{ title: "BAŞVURULAR", headerTitleAlign: "center" }} />
     </AdminStack.Navigator>
   );
 };
@@ -122,14 +136,15 @@ const App = () => {
           :
           <Tabs.Navigator options={{ headerShown: false }} screenOptions={({ route }) => ({
             tabBarIcon: ({ focused, color, size }) => {
-              return <Icon name={route.name === "Başvurular" ? "albums" : route.name === 'Admin' ? 'settings' : "person"} type="ionicon" color={color}
+              return <Icon name={route.name === "Başvurular" ? "albums" : route.name === 'Başvuru Yap' ? 'add' : route.name === 'Admin' ? 'settings' : "person"} type="ionicon" color={color}
                            size={size} />;
             },
             headerShown: false,
           })}>
-            <Tabs.Screen name="Başvurular" component={ApplicationStackScreen} />
+            {!isUserAdmin && <Tabs.Screen name="Başvurular" component={AllAppealsStackScreen} />}
+            <Tabs.Screen name={isUserAdmin ? 'Başvurular' : 'Başvuru Yap'} component={ApplicationStackScreen} />
             <Tabs.Screen name="Profil" component={ProfileStackScreen} />
-            {isUserAdmin && <Tabs.Screen name="Admin" component={AdminStackScreen} />}
+            {isUserAdmin && <Tabs.Screen name="Admin" component={AdminStackScreen} /> }
           </Tabs.Navigator>
         }
       </NavigationContainer>

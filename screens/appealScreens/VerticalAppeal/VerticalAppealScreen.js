@@ -14,7 +14,7 @@ import { Icon } from "react-native-elements";
 import getPath from "@flyerhq/react-native-android-uri-path";
 
 
-const VerticalAppealScreen= () => {
+const VerticalAppealScreen = () => {
   const [fileX, setFileX] = useState([{ name: null, uri: null }]);
   const [fileY, setFileY] = useState([{ name: null, uri: null }]);
   const [fileZ, setFileZ] = useState([{ name: null, uri: null }]);
@@ -363,6 +363,12 @@ const VerticalAppealScreen= () => {
         .set({
           isStart: 1,
           percent: 100,
+        }, { merge: true });
+
+      await firestore().collection("adminAppeals")
+        .doc(appealUUID)
+        .set({
+          isStart: 1,
         }, { merge: true });
     } catch (e) {
       console.log(e.message);
@@ -1046,7 +1052,8 @@ const VerticalAppealScreen= () => {
                       </View>
                     );
                   }) :
-                  <Text style={{ paddingHorizontal: 64, paddingVertical: 6, textAlign: "center" }}>Mezuniyet Belgesi</Text>}
+                  <Text style={{ paddingHorizontal: 64, paddingVertical: 6, textAlign: "center" }}>Mezuniyet
+                    Belgesi</Text>}
               </TouchableOpacity>
             </View>
           </View>

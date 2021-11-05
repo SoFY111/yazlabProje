@@ -11,10 +11,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { Icon } from "react-native-elements";
 
 const Application = () => {
-  const [allUserId, setAllUserId] = useState([]);
   const [appeals, setAppeals] = useState([]);
   const [adminAppeals, setAdminAppeals] = useState([]);
-  const [email, setEmail] = useState("");
   const navigation = useNavigation();
   const [isUserAdmin, setIsUserAdmin] = useState(false);
 
@@ -26,12 +24,6 @@ const Application = () => {
   }, []);
 
   useEffect(() => {
-    auth().onAuthStateChanged(user => {
-      setEmail(user?.email ?? "");
-    });
-  }, []);
-
-  useEffect(async () => {
     firestore().collection("users")
       .doc(auth().currentUser.uid)
       .collection("appeals")
@@ -44,8 +36,8 @@ const Application = () => {
         setAppeals(appealss);
       });
 
-    if (isUserAdmin) await getAllAppeal();
-  }, []);
+    if (isUserAdmin) getAllAppeal();
+  }, [isUserAdmin]);
 
   useEffect(() => {
     firestore().collection("users")
@@ -53,71 +45,110 @@ const Application = () => {
       .onSnapshot(doc => {
         doc.data()?.type === 1 ? setIsUserAdmin(true) : setIsUserAdmin(false);
       });
-
   }, [isSignedIn]);
 
-  const getAllAppeal = async () => {
-    firestore().collection("users")
-      .onSnapshot(docs => {
-        let allUsers = [];
-        docs.forEach(doc => {
-          allUsers.push({ id: doc.id });
-        });
-        setAllUserId(allUsers);
-      });
-    let allAppeal = [];
-    allUserId.forEach(userId => {
-      let user = [];
-      firestore().collection("users")
-        .doc(userId?.id)
+  const getApprovedAppeal = () => {
+    if (isUserAdmin) {
+      firestore().collection("adminAppeals")
+        .where("isStart", "==", 1)
+        .where("result.status", "==", 1)
         .onSnapshot(docs => {
-          user.push(docs.data());
-        });
-      firestore().collection("users")
-        .doc(userId?.id)
-        .collection("appeals")
-        .onSnapshot(docs => {
+          let appeals = [];
           docs.forEach(doc => {
-            allAppeal.push({
-              appealType: doc.data()?.appealType,
-              appealUUID: doc.data()?.appealUUID,
-              isStart: doc.data()?.isStart,
-              userId: userId?.id,
-              user,
-            });
+            appeals.push(doc.data());
           });
-          setAdminAppeals(allAppeal);
+          setAdminAppeals(appeals);
         });
-
-    });
-
+    }
   };
+
+  const getIgnoredAppeal = () => {
+    if (isUserAdmin) {
+      firestore().collection("adminAppeals")
+        .where("isStart", "==", 1)
+        .where("result.status", "==", 0)
+        .onSnapshot(docs => {
+          let appeals = [];
+          docs.forEach(doc => {
+            appeals.push(doc.data());
+          });
+          setAdminAppeals(appeals);
+        });
+    }
+  };
+
+  const getAllAppeal = () => {
+    if (isUserAdmin) {
+      firestore().collection("adminAppeals")
+        .where("isStart", "==", 1)
+        .onSnapshot(docs => {
+          let appeals = [];
+          docs.forEach(doc => {
+            appeals.push(doc.data());
+          });
+          setAdminAppeals(appeals);
+        });
+    }
+  };
+
+  const getWaitingAppeal = () => {
+    if (isUserAdmin) {
+      firestore().collection("adminAppeals")
+        .where("isStart", "==", 1)
+        .where("result.status", "==", 2)
+        .onSnapshot(docs => {
+          let appeals = [];
+          docs.forEach(doc => {
+            appeals.push(doc.data());
+          });
+          setAdminAppeals(appeals);
+        });
+    }
+  };
+
   return (
-    <View style={{ flex: 1, padding: 16 }}>
+    <View style={{ flex: 1, paddingVertical: 16 }}>
       {
         isUserAdmin ?
           <>
-            <Button onPress={async () => await getAllAppeal()}>getAllAppeals</Button>
+            <View>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <Button compact mode="contained" style={{ backgroundColor: "#FFC107" }}
+                        onPress={() => getWaitingAppeal()}>
+                  <Text style={{ color: "#fff" }}>Bekleyen Başvurular</Text>
+                </Button>
+                <Button compact mode="contained" style={{ marginLeft: 16 }} onPress={() => getAllAppeal()}>
+                  <Text style={{ color: "#fff" }}>Bütün Başvurular</Text>
+                </Button>
+                <Button compact mode="contained" style={{ marginLeft: 16, backgroundColor: "#0275d8" }}
+                        onPress={() => getApprovedAppeal()}>
+                  <Text style={{ color: "#fff" }}>Onaylanan Başvurular</Text>
+                </Button>
+                <Button compact mode="contained" style={{ marginLeft: 16, backgroundColor: "#cf3830" }}
+                        onPress={() => getIgnoredAppeal()}>
+                  <Text style={{ color: "#fff" }}>Onaylanmayan Başvurular</Text>
+                </Button>
+              </ScrollView>
+            </View>
             <ScrollView>
-              {adminAppeals.map((appeal) => (
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
+              {adminAppeals.length > 0 && adminAppeals.map((appeal) => (
+                <View key={appeal.appealUUID} style={{ flexDirection: "row", alignItems: "center", padding: 6 }}>
                   <View>
-                    {appeal.isStart === 2 ?
-                      <Icon name="alert" type="ionicon" color="red" size={14} />
-                      :
-                      <Icon name="checkmark" type="ionicon" color="#5AA658" size={14} />
-                    }
+                    <Icon name="checkmark" type="ionicon" color="#5AA658" size={14} />
                   </View>
-                  <View key={appeal.appealUUID} style={{
+                  <View  style={{
                     flexDirection: "row",
                     flex: 1,
                     justifyContent: "space-between",
                     alignItems: "center",
                     padding: 6,
                   }}>
-                    <Text>{appeal.user?.[0]?.name}</Text>
+                    <Text>{appeal.user?.name}</Text>
                     <Text>{appeal.appealType === 0 ? "ÇAP Başvurusu" : appeal.appealType === 1 ? "DGS Başvurusu" : appeal.appealType === 2 ? "Yatay Geçiş Başvurusu" : appeal.appealType === 3 ? "Yaz Okulu" : "Ders İntibak Başvurusu"}</Text>
-                    <Pressable onPress={() => navigation.navigate('AppealDetail', {appealUUID: appeal?.appealUUID, userId: appeal?.userId})}>
+                    <Pressable onPress={() => navigation.navigate("AppealDetail", {
+                      appealUUID: appeal?.appealUUID,
+                      userId: appeal?.user?.id,
+                    })}>
                       <Icon name="eye" type="ionicon" color="#5AA658" size={14} />
                     </Pressable>
                   </View>

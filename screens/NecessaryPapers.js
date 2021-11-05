@@ -72,7 +72,11 @@ const NecessaryPapers = () => {
             .delete()
         })
 
-      const response = await firestore().collection("users")
+      await firestore().collection('adminAppeals')
+        .doc(startedAppealUUID)
+        .delete()
+
+      await firestore().collection("users")
         .doc(auth().currentUser.uid)
         .collection("appeals")
         .doc(appealUUID).set({
@@ -87,6 +91,23 @@ const NecessaryPapers = () => {
           },
           createdAt: Date.now()
         }, { merge: true });
+
+      await firestore().collection('adminAppeals')
+        .doc(appealUUID)
+        .set({
+          appealUUID,
+          user:{
+            id: auth().currentUser.uid,
+            name: auth().currentUser.displayName
+          },
+          appealType,
+          isStart: 2,
+          result:{
+            status:2,
+            description: null
+          }
+        }, {merge: true})
+
       if(appealType === 0) navigation.navigate('DoubleMajorAppealScreen', {appealUUID: appealUUID});
       else if(appealType === 1) navigation.navigate('VerticalAppealScreen', {appealUUID: appealUUID});
       else if(appealType === 2) navigation.navigate('HorizontalAppealScreen', {appealUUID: appealUUID});

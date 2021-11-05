@@ -257,6 +257,7 @@ const DoubleMajorAppealScreen = () => {
             setFileUploadedLoader(false);
           }, 2000);
         });
+
     } catch (e) {
       console.log(e.message);
     }
@@ -370,6 +371,12 @@ const DoubleMajorAppealScreen = () => {
         .set({
           isStart: 1,
           percent: 100
+        }, {merge: true})
+
+      await firestore().collection('adminAppeals')
+        .doc(appealUUID)
+        .set({
+          isStart: 1,
         }, {merge: true})
     }
     catch (e) {

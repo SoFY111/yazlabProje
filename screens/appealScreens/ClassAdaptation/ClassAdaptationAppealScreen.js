@@ -35,7 +35,7 @@ const ClassAdaptationAppealScreen = () => {
   const [percentCounter, setPercentCounter] = useState(0);
   const [userData, setUserData] = useState(null);
   const [appealUUID, setAppealUUID] = useState(useRoute().params?.appealUUID);
-  const navigation = useNavigation()
+  const navigation = useNavigation();
 
   useEffect(() => {
 
@@ -159,13 +159,13 @@ const ClassAdaptationAppealScreen = () => {
         .collection("appeals")
         .doc(appealUUID)
         .set({
-          percent: (percentCounter+1)/4*100,
+          percent: (percentCounter + 1) / 4 * 100,
           files: {
             fileX: fileName,
           },
         }, { merge: true }).then(() => {
-          setPercentCounter(percentCounter + 1)
-          setFileXisLoading(false)
+          setPercentCounter(percentCounter + 1);
+          setFileXisLoading(false);
           setFileX([{ name: fileName, uri: null }]);
           setIsUploadedFileX([{ name: fileName }]);
           setFileUploadedLoader(true);
@@ -178,13 +178,13 @@ const ClassAdaptationAppealScreen = () => {
         .collection("appeals")
         .doc(appealUUID)
         .set({
-          percent: (percentCounter+1)/4*100,
+          percent: (percentCounter + 1) / 4 * 100,
           files: {
             fileY: fileName,
           },
         }, { merge: true }).then(() => {
-          setPercentCounter(percentCounter + 1)
-          setFileYisLoading(false)
+          setPercentCounter(percentCounter + 1);
+          setFileYisLoading(false);
           setFileY([{ name: fileName, uri: null }]);
           setIsUploadedFileY([{ name: fileName }]);
           setFileUploadedLoader(true);
@@ -197,13 +197,13 @@ const ClassAdaptationAppealScreen = () => {
         .collection("appeals")
         .doc(appealUUID)
         .set({
-          percent: (percentCounter+1)/4*100,
+          percent: (percentCounter + 1) / 4 * 100,
           files: {
             fileZ: fileName,
           },
         }, { merge: true }).then(() => {
-          setPercentCounter(percentCounter + 1)
-          setFileZisLoading(false)
+          setPercentCounter(percentCounter + 1);
+          setFileZisLoading(false);
           setFileZ([{ name: fileName, uri: null }]);
           setIsUploadedFileZ([{ name: fileName }]);
           setFileUploadedLoader(true);
@@ -216,13 +216,13 @@ const ClassAdaptationAppealScreen = () => {
         .collection("appeals")
         .doc(appealUUID)
         .set({
-          percent: ((percentCounter+1)/4*100),
+          percent: ((percentCounter + 1) / 4 * 100),
           files: {
             fileQ: fileName,
           },
         }, { merge: true }).then(() => {
-          setPercentCounter(percentCounter + 1)
-          setFileQisLoading(false)
+          setPercentCounter(percentCounter + 1);
+          setFileQisLoading(false);
           setFileQ([{ name: fileName, uri: null }]);
           setIsUploadedFileQ([{ name: fileName }]);
           setFileUploadedLoader(true);
@@ -253,7 +253,7 @@ const ClassAdaptationAppealScreen = () => {
                 .collection("appeals")
                 .doc(appealUUID)
                 .set({
-                  percent: (percentCounter - 1)/4*100,
+                  percent: (percentCounter - 1) / 4 * 100,
                   files: {
                     fileX: null,
                   },
@@ -268,7 +268,7 @@ const ClassAdaptationAppealScreen = () => {
                 .collection("appeals")
                 .doc(appealUUID)
                 .set({
-                  percent: (percentCounter - 1)/4*100,
+                  percent: (percentCounter - 1) / 4 * 100,
                   files: {
                     fileY: null,
                   },
@@ -283,7 +283,7 @@ const ClassAdaptationAppealScreen = () => {
                 .collection("appeals")
                 .doc(appealUUID)
                 .set({
-                  percent: (percentCounter - 1)/4*100,
+                  percent: (percentCounter - 1) / 4 * 100,
                   files: {
                     fileZ: null,
                   },
@@ -298,7 +298,7 @@ const ClassAdaptationAppealScreen = () => {
                 .collection("appeals")
                 .doc(appealUUID)
                 .set({
-                  percent: (percentCounter - 1)/4*100,
+                  percent: (percentCounter - 1) / 4 * 100,
                   files: {
                     fileQ: null,
                   },
@@ -322,20 +322,26 @@ const ClassAdaptationAppealScreen = () => {
 
   const finishAppeal = async () => {
     try {
-      await firestore().collection('users')
+      await firestore().collection("users")
         .doc(auth().currentUser.uid)
-        .collection('appeals')
+        .collection("appeals")
         .doc(appealUUID)
         .set({
           isStart: 1,
-          percent: 100
-        }, {merge: true})
+          percent: 100,
+        }, { merge: true });
+
+      await firestore().collection("adminAppeals")
+        .doc(appealUUID)
+        .set({
+          isStart: 1,
+        }, { merge: true });
+
+    } catch (e) {
+      console.log(e.message);
     }
-    catch (e) {
-      console.log(e.message)
-    }
-    navigation.navigate('Applications')
-  }
+    navigation.navigate("Applications");
+  };
 
   return (
     <View style={styles.container}>
@@ -345,11 +351,16 @@ const ClassAdaptationAppealScreen = () => {
           KOCAELİ ÜNİVERSİTESİ MUAFİYET VE İNTİBAK YÖNERGESİ
           BiRiNCİ BÖLÜM
           Amaç, Kapsam, Dayanak ve Tanımlar
-          MADDE 1- (1) Bu Yönergenin amacı; Yükseköğretim Kurulu tarafından denkliği kabul edilen bir önlisans veya lisans programından gelen öğrencilerin, Kocaeli Üniversitesinde önlisans ve lisans eğitim-öğretimi yapan fakülte, yüksekokul, meslek yüksekokul ve devlet konservatuarında ders muafiyet ve intibak usul ve esaslarını düzenlemektir,
+          MADDE 1- (1) Bu Yönergenin amacı; Yükseköğretim Kurulu tarafından denkliği kabul edilen bir önlisans
+          veya lisans programından gelen öğrencilerin, Kocaeli Üniversitesinde önlisans ve lisans eğitim-öğretimi
+          yapan fakülte, yüksekokul, meslek yüksekokul ve devlet konservatuarında ders muafiyet ve intibak usul ve
+          esaslarını düzenlemektir,
           Kapsam
-          MADDE 2- (1) Bu Yönerge, Kocaeli Üniversitesi muafiyet ve intibak uygulamalarına ilişkin usul ve esasları kapsar.
+          MADDE 2- (1) Bu Yönerge, Kocaeli Üniversitesi muafiyet ve intibak uygulamalarına ilişkin usul ve esasları
+          kapsar.
           Dayanak
-          MADDE 3- (1) Bu Yönerge, 4/11/1981 tarihli ve 2547 sayılı Yükseköğretim Kanunu’un 14’üncü maddesine dayandırılarak hazırlanılmıştır.
+          MADDE 3- (1) Bu Yönerge, 4/11/1981 tarihli ve 2547 sayılı Yükseköğretim Kanunu’un 14’üncü maddesine
+          dayandırılarak hazırlanılmıştır.
           Tanımlar
           MADDE 4- (1) Bu Yönergede geçen;
           a) Akademik Birim: Eğitim-öğretim faaliyetinin yülrütüldüğü Fakülte/Yiiksekokul
@@ -364,45 +375,94 @@ const ClassAdaptationAppealScreen = () => {
 
           İKİNCİ BÖLÜM
 
-          Muafiyet ve İntibak komisyonunun oluşturulmısı, Başvurular ve Başvuru Şartları, Ders Muafıyeti Değerlendirmesi ve Muafiyet Raporu,
+          Muafiyet ve İntibak komisyonunun oluşturulmısı, Başvurular ve Başvuru Şartları, Ders Muafıyeti
+          Değerlendirmesi ve Muafiyet Raporu,
           Muafiyet ve İntibakların Yapılması
-          MADDE 5- (1) Komisyon, akademik birim tarafından ''Akademik Birim Komisyonu'' olarak oluşturulabileceği gibi, ilgili bölüm başkanı tarafından, bölüm başkanı veya bölüm başkan yardımcısının başkanlığında, ders vermekle yükümlü en az üç öğretim elemanından bölüm komisyonu olarak da oluşturulabilir.
+          MADDE 5- (1) Komisyon, akademik birim tarafından ''Akademik Birim Komisyonu'' olarak oluşturulabileceği
+          gibi, ilgili bölüm başkanı tarafından, bölüm başkanı veya bölüm başkan yardımcısının başkanlığında,
+          ders vermekle yükümlü en az üç öğretim elemanından bölüm komisyonu olarak da oluşturulabilir.
           Muafiyet ve intibak başvuruları
-          MADDE 6- (1) Muafiyet ve intibak başıurulan, kayıt yaptırılan eğitim-öğretim yılının/ yarıyılının en geç birinci haftası sonuna kadar ilgili bölüm başkanlıklanna şahsen yapılır. posta ile yapılan başvurular kabul edilmez. Başvuru yapan öğrenci istenen belgeleri eksiksiz teslim ettiğine ilişkin "evrak teslim tutanağını" imzalar. Evrakları teslim alan personel,
-          Öğrenciye evraklarını teslim aldığına ilişkin bir belge verir. Başvuru sonuçları 15 gün içerisinde akademik birim yönetim kurulları tarafından karara bağlanır.
+          MADDE 6- (1) Muafiyet ve intibak başıurulan, kayıt yaptırılan eğitim-öğretim yılının/ yarıyılının en geç
+          birinci haftası sonuna kadar ilgili bölüm başkanlıklanna şahsen yapılır. posta ile yapılan başvurular
+          kabul edilmez. Başvuru yapan öğrenci istenen belgeleri eksiksiz teslim ettiğine ilişkin "evrak teslim
+          tutanağını" imzalar. Evrakları teslim alan personel,
+          Öğrenciye evraklarını teslim aldığına ilişkin bir belge verir. Başvuru sonuçları 15 gün içerisinde akademik
+          birim yönetim kurulları tarafından karara bağlanır.
           (2) ÖSYM tarafından yapılan ek yerleştirmelerde ise mevzuata göre en kısa sürede işlem yapılır.
-          (3) Bu Yönergenin 6 ncı maddesinin birinci fırkasında belirtilen zamanlar dışında muafiyet ve intibak başvurusunda bulunulamaz. Muafiyet ve intibak başvurusu sadece bir defaya mahsus yapılır.
+          (3) Bu Yönergenin 6 ncı maddesinin birinci fırkasında belirtilen zamanlar dışında muafiyet ve intibak
+          başvurusunda bulunulamaz. Muafiyet ve intibak başvurusu sadece bir defaya mahsus yapılır.
           Ders muıfiyetine başvuru şartları
-          MADDE 7- (l) Kocaeli Üniversitesinin herhangi bir birimine kayıt yaptıran bir öğrenci, aşağıdaki şartlan sağlaması durumunda, kayıt yaptırdığı bölüme ders muafiyet dilekçesi ile başvuruda bulunabilir.
+          MADDE 7- (l) Kocaeli Üniversitesinin herhangi bir birimine kayıt yaptıran bir öğrenci, aşağıdaki şartlan
+          sağlaması durumunda, kayıt yaptırdığı bölüme ders muafiyet dilekçesi ile başvuruda bulunabilir.
           a) Öğrenci, muafiyet dilekçesinde, muaf olmak istediği dersleri belirtmeli,
-          b) Dikey geçişle geldiğini veya daha önce Yükseköğretim Kurulu tarafından denkliği kabul edilen bir önlisans veya lisans programında eğitim gördüğünü, ders aldığını ve başarılı olduğunu transkript ile belgelemeli,
-          c) Muafiyet talebinde bulunduğu dersler için, ders aldığı kurum tarafindan onaylanmış ders içeriğini ve ders kazanımlarını/öğrenme çıktılarını belgelemelidir.
+          b) Dikey geçişle geldiğini veya daha önce Yükseköğretim Kurulu tarafından denkliği kabul edilen bir
+          önlisans veya lisans programında eğitim gördüğünü, ders aldığını ve başarılı olduğunu transkript ile
+          belgelemeli,
+          c) Muafiyet talebinde bulunduğu dersler için, ders aldığı kurum tarafindan onaylanmış ders içeriğini ve
+          ders kazanımlarını/öğrenme çıktılarını belgelemelidir.
           Ders muafiyeti değerlendirmesi
-          MADDE 8- (1) Öğrencinin ders muafiyeti değerlendirilirken, eşdeğer programlardan gelen öğrenciler için; beyan edilen ders(ler)in, yarıyıl gözetilmeksizin, ilgili böliim müfredatındaki benzer içeriğe veya ders kazanımına/öğrenme çıktısına sahip olma şartı aranır.
-          (2) Diğer programlardan gelen öğrenciler için; benzer ders kazanrmları/öğrenme çıktıları ve ders içeriği olmakla birlikte, ders(ler)in AKTS/kredi/saat değer(ler)inden herhangi birine eşdeğer olma şartı aranır.
+          MADDE 8- (1) Öğrencinin ders muafiyeti değerlendirilirken, eşdeğer programlardan gelen öğrenciler
+          için; beyan edilen ders(ler)in, yarıyıl gözetilmeksizin, ilgili böliim müfredatındaki benzer içeriğe veya
+          ders kazanımına/öğrenme çıktısına sahip olma şartı aranır.
+          (2) Diğer programlardan gelen öğrenciler için; benzer ders kazanrmları/öğrenme çıktıları ve ders
+          içeriği olmakla birlikte, ders(ler)in AKTS/kredi/saat değer(ler)inden herhangi birine eşdeğer olma şartı
+          aranır.
           Muafiyet raporu
-          MADDE 9- (1) Komisyon tarafından hazırlanan muafiyet raporu, komisyon üyelerinin imzası ve komisyon başkanının onayı ile ilgili akademik birim yönetim kuruluna sunulur. Yönetim kurulunun kararından sonra, muaf olunan veya muaf olunmayan derslere ilişkin detaylı muafiyet kararı, gerekçeleri ile birlikte ilgili öğrenciye ve Ögrenci İşleri Daire Başkanlığına bildirilir. Öğrenci, verilen listeyi sonraki ders seçimlerindIe kullanmak üzere saklamak ve danışmanını bu konuda bilgilendirmekle yükümlüdür.
+          MADDE 9- (1) Komisyon tarafından hazırlanan muafiyet raporu, komisyon üyelerinin imzası ve komisyon
+          başkanının onayı ile ilgili akademik birim yönetim kuruluna sunulur. Yönetim kurulunun kararından sonra,
+          muaf olunan veya muaf olunmayan derslere ilişkin detaylı muafiyet kararı, gerekçeleri ile birlikte ilgili
+          öğrenciye ve Ögrenci İşleri Daire Başkanlığına bildirilir. Öğrenci, verilen listeyi sonraki ders
+          seçimlerindIe kullanmak üzere saklamak ve danışmanını bu konuda bilgilendirmekle yükümlüdür.
           Muafıyet ve intibakın yapılması
-          MADDE 10- (1) Muafiyeti yapılan öğrencinin, .ilgili şartları sağlaması ve talepte bulunması halinde üst yarıyıllara intibakı yapılabilir. Öğrencinin muafıyet ve intibakının yapılabilmesi için aşağıda belirtilen durumlar göz önüne alınır:
-          a) Öğrenci önlisans/lisans mezunu iken ÖSYM sınavlarına tekrar girerek Üniversiteye kaydını yaptırması halinde, mezun olduğu böltimdeki 4'lük sistem üzerinden notu 2'nin altnda başarılı olduğu derslerden CC harf nofu ile muaf sayılır.
-          b) Öğrenim gördüğü bölümden mezun olmadan ÖSYM sınav sonuçları veya yatay geçiş ile kayıt yaptıran öğrenciler için, 4'lü sistem üzerinden notu 2'nin altında başarlı olduğu ders değerlendirilirken genel not ortalamasına bakılır. Genel not ortalaması 2'nin altında ise öğrenci o dersten muaf edilmez; 2 ve üzerinde ise başarılı ve CC harf notu ile muaf sayılır.
+          MADDE 10- (1) Muafiyeti yapılan öğrencinin, .ilgili şartları sağlaması ve talepte bulunması halinde üst
+          yarıyıllara intibakı yapılabilir. Öğrencinin muafıyet ve intibakının yapılabilmesi için aşağıda
+          belirtilen durumlar göz önüne alınır:
+          a) Öğrenci önlisans/lisans mezunu iken ÖSYM sınavlarına tekrar girerek Üniversiteye kaydını yaptırması
+          halinde, mezun olduğu böltimdeki 4'lük sistem üzerinden notu 2'nin altnda başarılı olduğu derslerden CC
+          harf nofu ile muaf sayılır.
+          b) Öğrenim gördüğü bölümden mezun olmadan ÖSYM sınav sonuçları veya yatay geçiş ile kayıt yaptıran
+          öğrenciler için, 4'lü sistem üzerinden notu 2'nin altında başarlı olduğu ders değerlendirilirken genel
+          not ortalamasına bakılır. Genel not ortalaması 2'nin altında ise öğrenci o dersten muaf edilmez; 2 ve
+          üzerinde ise başarılı ve CC harf notu ile muaf sayılır.
           c) Öğrenci başka bir üniversiteden muaf/yeterlİ/başarılı gibi değerlendirmeler ile gelmiş ise;
-          1) Öğencinin bu derslerin notunu belgelendirmesi halinde, o notun kaışılığı koü not sistemine dönüştiirüliir; belgelendirememesi durumunda ise o dersleıe KOÜ not sistemindeki CC harf notu verilir.
-          2) Muaf olunan dersler, yarıyıl içi ortalamalanna katılmaz (bu derslerin başansı %10 hesaplamalarında dikkate alınmaz). Ancak genel not ortalamasına katılır.
-          ç) Öğrencinin önlisans/lisans programından mezun olması veya öğrenim gördüğü bölüm/programdan mezun olmadan ÖSYM sınavına tekar girerek Üniversiteye kaydını yaptırması halinde, tüm yarıyıllara/yıllara ait toplam muaf olunan derslerin her bir 40 AKTS değeri için bir üst sınıfa intibakı yapılır, Bu şekildeki intibaklar; önlisans programları için en fazla 3. yarıyıla, lisans programlan için ise en fazla 5. yarıyıla yapılır.
-          (2) İntibakı yapılan bir öğrenci, intibak ettirildiği yarıyıldan önceki yanyıllara ait muaf olmadığı dersleri almak zorundadır.
-          (3) Yatay/Dikey geçişlerle veya Yükseköğretim Kurumlarında Önlisans ve Lisans Düzeyindeki Programlar Arasında Geçiş, Çift Anadal, Yan Dal ile Kurumlar Arası Kredi Transferi Yapılması Esaslanna İlişkin Yönetmelik kapsamında nakil yoluyla Üniversiteye gelen öğrencilerin, alt yarıyıllardan muaf olmadıkları dersleri almak koşuluyla, geldikleri yarıyıl/yıla kayıtları yapılır. Bu şekilde Üniversiteye gelen öğrencilerden bu Yönergenin 10 uncu maddesinin (ç) bendinde belirtilen 40 AKTS koşulu aranmaz.
-          (4) Daha önce öğrenim gördüğü bir üniversitede yaptığı stajı belgeleyen ve kaydını yaptırdığı birimin Staj Komisyonu tarafından stajı onaylanan öğrencinin, staj dersinin kredi karışılıkları ile muafiyeti yapılır,
-          (5) Öğrencinin transkriptinde başarılı olduğu bir ders, birden fazla derse veya birden fazla başarılı olduğu dersler bir derse eşdeğer sayılabilir. Bu durumda; birden fazla dersin bir derse eşdeğer olması halinde başarılı olunan derslerin ağırlıklı not ortalaması muaf olunan dersin başarı notu; bir dersin birden fazla derse eşdeğer olması durumunda ise başarılı olunan dersin notu, muaf olunan diğer derslerin başan notu olarak yazılır.
+          1) Öğencinin bu derslerin notunu belgelendirmesi halinde, o notun kaışılığı koü not sistemine
+          dönüştiirüliir; belgelendirememesi durumunda ise o dersleıe KOÜ not sistemindeki CC harf notu verilir.
+          2) Muaf olunan dersler, yarıyıl içi ortalamalanna katılmaz (bu derslerin başansı %10 hesaplamalarında
+          dikkate alınmaz). Ancak genel not ortalamasına katılır.
+          ç) Öğrencinin önlisans/lisans programından mezun olması veya öğrenim gördüğü bölüm/programdan mezun
+          olmadan ÖSYM sınavına tekar girerek Üniversiteye kaydını yaptırması halinde, tüm yarıyıllara/yıllara ait
+          toplam muaf olunan derslerin her bir 40 AKTS değeri için bir üst sınıfa intibakı yapılır, Bu şekildeki
+          intibaklar; önlisans programları için en fazla 3. yarıyıla, lisans programlan için ise en fazla 5. yarıyıla
+          yapılır.
+          (2) İntibakı yapılan bir öğrenci, intibak ettirildiği yarıyıldan önceki yanyıllara ait muaf olmadığı
+          dersleri almak zorundadır.
+          (3) Yatay/Dikey geçişlerle veya Yükseköğretim Kurumlarında Önlisans ve Lisans Düzeyindeki Programlar
+          Arasında Geçiş, Çift Anadal, Yan Dal ile Kurumlar Arası Kredi Transferi Yapılması Esaslanna İlişkin
+          Yönetmelik kapsamında nakil yoluyla Üniversiteye gelen öğrencilerin, alt yarıyıllardan muaf olmadıkları
+          dersleri almak koşuluyla, geldikleri yarıyıl/yıla kayıtları yapılır. Bu şekilde Üniversiteye gelen
+          öğrencilerden bu Yönergenin 10 uncu maddesinin (ç) bendinde belirtilen 40 AKTS koşulu aranmaz.
+          (4) Daha önce öğrenim gördüğü bir üniversitede yaptığı stajı belgeleyen ve kaydını yaptırdığı birimin
+          Staj Komisyonu tarafından stajı onaylanan öğrencinin, staj dersinin kredi karışılıkları ile muafiyeti
+          yapılır,
+          (5) Öğrencinin transkriptinde başarılı olduğu bir ders, birden fazla derse veya birden fazla başarılı
+          olduğu dersler bir derse eşdeğer sayılabilir. Bu durumda; birden fazla dersin bir derse eşdeğer olması
+          halinde başarılı olunan derslerin ağırlıklı not ortalaması muaf olunan dersin başarı notu; bir dersin
+          birden fazla derse eşdeğer olması durumunda ise başarılı olunan dersin notu, muaf olunan diğer derslerin
+          başan notu olarak yazılır.
           İtiraz
-          MADDE 11-(1) Muafiyet kararının ilanından itibaren 3 (üç) iş gtinü içerisinde öğrenci muafiyet kararına ilgili bölüm/program başkanlığına dilekçe ile itirazda bulunabilir. İtiraz başvurusu komisyon tarafından 10 (on) gün içerisinde sonuçlandırılarak, ilgili yönetim kurulu tarafından karara bağlanır.
+          MADDE 11-(1) Muafiyet kararının ilanından itibaren 3 (üç) iş gtinü içerisinde öğrenci muafiyet kararına
+          ilgili bölüm/program başkanlığına dilekçe ile itirazda bulunabilir. İtiraz başvurusu komisyon tarafından
+          10 (on) gün içerisinde sonuçlandırılarak, ilgili yönetim kurulu tarafından karara bağlanır.
           ÜÇÜNCÜ BÖLÜM
           Son Hükümler
           Hüküm bulunmayan haller
-          MADDE 12- (1) Bu Yönergede hüküm bulunmayan hallerde, ilgili mevzuat hükümleri ile Senato kararları uygulanır.
+          MADDE 12- (1) Bu Yönergede hüküm bulunmayan hallerde, ilgili mevzuat hükümleri ile Senato kararları
+          uygulanır.
 
           Yürürlük
-          MADDE 13- (1) Bu Yönerge, 2019-2020 eğitim-öğretim yılından itibaren yürürlüğe girer, Bu Yönergenin_ yürürlüğe girmesi ile 16/11/2016 tarihli ve 2 nolu Senato kararıyla kabul edilen Kocaeli Üniversitesi Muafiyet ve İntibak Yönergesi yürürlülükten kaldırılmıştır.
+          MADDE 13- (1) Bu Yönerge, 2019-2020 eğitim-öğretim yılından itibaren yürürlüğe girer, Bu Yönergenin_
+          yürürlüğe girmesi ile 16/11/2016 tarihli ve 2 nolu Senato kararıyla kabul edilen Kocaeli Üniversitesi
+          Muafiyet ve İntibak Yönergesi yürürlülükten kaldırılmıştır.
 
           Yürütme
           MADDE 14- (1) Bu Yönerge hükümlerini Kocaeli Üniversitesi Rektörü yürütür.
@@ -472,22 +532,23 @@ const ClassAdaptationAppealScreen = () => {
                 onPress={() => docPicker("y")}
               >
                 {fileY[0].name ? fileY.map(({ name, uri }) => {
-                  return (
-                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-                      <Text>{name.length > 25 ? name.substring(0, 22) + "..." : name}</Text>
-                      <TouchableOpacity style={{ marginLeft: 18 }}
-                                        onPress={() => deleteFile("y", name)}>
-                        <Icon name="close" type="ionicon" />
-                      </TouchableOpacity>
-                      <Button style={{ marginLeft: 4 }} mode="contained" loading={fileYisLoading}
-                              onPress={async () => {
-                                setFileYisLoading(true)
-                                await uploadFile("y");
-                              }}><Text
-                        style={{ color: "#fff" }}>Yükle</Text></Button>
-                    </View>
-                  );
-                }) : <Text style={{ paddingHorizontal: 64, paddingVertical: 6, textAlign: "center" }}>Ders İçeriği</Text>}
+                    return (
+                      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                        <Text>{name.length > 25 ? name.substring(0, 22) + "..." : name}</Text>
+                        <TouchableOpacity style={{ marginLeft: 18 }}
+                                          onPress={() => deleteFile("y", name)}>
+                          <Icon name="close" type="ionicon" />
+                        </TouchableOpacity>
+                        <Button style={{ marginLeft: 4 }} mode="contained" loading={fileYisLoading}
+                                onPress={async () => {
+                                  setFileYisLoading(true);
+                                  await uploadFile("y");
+                                }}><Text
+                          style={{ color: "#fff" }}>Yükle</Text></Button>
+                      </View>
+                    );
+                  }) :
+                  <Text style={{ paddingHorizontal: 64, paddingVertical: 6, textAlign: "center" }}>Ders İçeriği</Text>}
               </TouchableOpacity>
             </View>
             <View key={2}>
@@ -513,7 +574,7 @@ const ClassAdaptationAppealScreen = () => {
                       </TouchableOpacity>
                       <Button style={{ marginLeft: 4 }} mode="contained" loading={fileZisLoading}
                               onPress={async () => {
-                                setFileZisLoading(true)
+                                setFileZisLoading(true);
                                 await uploadFile("z");
                               }}><Text
                         style={{ color: "#fff" }}>Yükle</Text></Button>
@@ -545,14 +606,15 @@ const ClassAdaptationAppealScreen = () => {
                         </TouchableOpacity>
                         <Button style={{ marginLeft: 4 }} mode="contained" loading={fileQisLoading}
                                 onPress={async () => {
-                                  setFileQisLoading(true)
+                                  setFileQisLoading(true);
                                   await uploadFile("q");
                                 }}><Text
                           style={{ color: "#fff" }}>Yükle</Text></Button>
                       </View>
                     );
                   }) :
-                  <Text style={{ paddingHorizontal: 64, paddingVertical: 6, textAlign: "center" }}>Muafiyet Dilekçesi</Text>}
+                  <Text style={{ paddingHorizontal: 64, paddingVertical: 6, textAlign: "center" }}>Muafiyet
+                    Dilekçesi</Text>}
               </TouchableOpacity>
             </View>
           </View>
@@ -607,9 +669,9 @@ const styles = StyleSheet.create({
   scv: {
     flex: 1,
     borderWidth: 1,
-    borderColor: 'rgba(0,0,0, .2)',
-    borderRadius:4,
-    padding:8,
+    borderColor: "rgba(0,0,0, .2)",
+    borderRadius: 4,
+    padding: 8,
   },
   nextButtonContainer: {
     flexDirection: "row",
