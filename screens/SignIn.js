@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { Image, Pressable, View } from "react-native";
+import React, { useState } from "react";
+import { Pressable, View } from "react-native";
 import { Avatar, Button, Subheading, Text, TextInput } from "react-native-paper";
 import { useNavigation } from "@react-navigation/core";
 
-import { useSelector, useDispatch } from 'react-redux'
-import { userAuthChange }  from '../redux/actions/isUserSignedInAction'
+import { useDispatch } from "react-redux";
+import { userAuthChange } from "../redux/actions/isUserSignedInAction";
 
 import auth from "@react-native-firebase/auth";
 
-import kouLogo from '../src/pictures/kou-logo.png'
+import kouLogo from "../src/pictures/kou-logo.png";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
@@ -18,14 +18,14 @@ const SignIn = () => {
 
   const navigation = useNavigation();
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
 
   const signIn = async () => {
     setIsLoading(true);
     try {
       await auth().signInWithEmailAndPassword(email, password);
-      dispatch(userAuthChange())
+      dispatch(userAuthChange());
       setIsLoading(false);
     } catch (e) {
       setIsLoading(false);
@@ -34,17 +34,17 @@ const SignIn = () => {
     }
   };
   return (
-    <View style={{ flex:1,justifyContent:"center" }}>
-      <View style={{marginLeft: 36, marginRight:36, marginBottom: 100}}>
-        <View style={{alignItems:"center"}}>
-          <Avatar.Image source={kouLogo} size={180} style={{marginBottom:62}}/>
+    <View style={{ flex: 1, justifyContent: "center" }}>
+      <View style={{ marginLeft: 36, marginRight: 36, marginBottom: 100 }}>
+        <View style={{ alignItems: "center" }}>
+          <Avatar.Image source={kouLogo} size={180} style={{ marginBottom: 62 }} />
         </View>
         {!!error && (
           <Subheading style={{ color: "red", textAlign: "center", marginBottom: 16 }}>{error}</Subheading>
         )}
         <TextInput
           label="E-Mail"
-          style={{ marginTop: 12}}
+          style={{ marginTop: 12 }}
           value={email}
           onChangeText={(text) => setEmail(text)}
           keyboardType="email-address"
@@ -56,8 +56,8 @@ const SignIn = () => {
           onChangeText={(text) => setPassword(text)}
           secureTextEntry
         />
-        <Pressable onPress={() => navigation.navigate('ForgotPassword')}>
-          <Text style={{marginTop:4, fontSize:12}}>{'şifremi unuttum'.toUpperCase()}</Text>
+        <Pressable onPress={() => navigation.navigate("ForgotPassword")}>
+          <Text style={{ marginTop: 4, fontSize: 12 }}>{"şifremi unuttum".toUpperCase()}</Text>
         </Pressable>
         <View>
           <Button
@@ -65,13 +65,22 @@ const SignIn = () => {
             disabled={email === "" || password === ""}
             onPress={() => signIn()}
             loading={isLoading}
-            style={{marginTop:42, padding:4, height:48, width: '100%'}}>
-            <Text style={{color:'#fff'}}>Giriş Yap</Text>
+            style={{ marginTop: 42, padding: 4, height: 48, width: "100%" }}>
+            <Text style={{ color: "#fff" }}>Giriş Yap</Text>
           </Button>
         </View>
       </View>
-      <View style={{position:'absolute', width:'100%', height: 50, bottom:0, left:0, paddingTop:6, borderTopWidth:1, borderTopColor: 'rgba(0, 0, 0, 0.23)'}}>
-        <Button onPress={() => navigation.navigate("SignUp")}>Hesabın yok mu? {'hemen aç'.toUpperCase() }</Button>
+      <View style={{
+        position: "absolute",
+        width: "100%",
+        height: 50,
+        bottom: 0,
+        left: 0,
+        paddingTop: 6,
+        borderTopWidth: 1,
+        borderTopColor: "rgba(0, 0, 0, 0.23)",
+      }}>
+        <Button onPress={() => navigation.navigate("SignUp")}>Hesabın yok mu? {"hemen aç".toUpperCase()}</Button>
       </View>
     </View>
   );

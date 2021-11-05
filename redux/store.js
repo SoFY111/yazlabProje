@@ -1,11 +1,11 @@
-import {createStore, combineReducers} from "redux";
-import isUserSignedInReducer from './reducer/isUserSignedInReducer';
+import { combineReducers, createStore } from "redux";
+import isUserSignedInReducer from "./reducer/isUserSignedInReducer";
 
 
 const reducers = combineReducers({
-  isUserSignedIn: isUserSignedInReducer
-})
+  isUserSignedIn: isUserSignedInReducer,
+});
 
-const store = createStore(reducers)
+const store = createStore(reducers);
 
-export default store
+export default store;

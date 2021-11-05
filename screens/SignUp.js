@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Platform, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { Button, Subheading, TextInput, useTheme } from "react-native-paper";
+import { Button, Subheading, TextInput } from "react-native-paper";
 import { useNavigation } from "@react-navigation/core";
 
 import PhoneInput from "react-native-phone-input/dist";
@@ -17,7 +17,7 @@ import storage from "@react-native-firebase/storage";
 import getPath from "@flyerhq/react-native-android-uri-path";
 
 const SignUp = () => {
-  const [fileX, setFileX] = useState([{ name: null, uri: null }])
+  const [fileX, setFileX] = useState([{ name: null, uri: null }]);
   const [isUploadedFileX, setIsUploadedFileX] = useState([{ name: null, uri: null }]);
   const [studentNumber, setStudentNumber] = useState("");
   const [name, setName] = useState("");
@@ -33,44 +33,44 @@ const SignUp = () => {
   const [faculty, setFaculty] = useState("");
   const [departmant, setDepartmant] = useState("");
 
-  const [faculties, setFaculties] = useState([])
-  const [departmans, setDepartmans] = useState([])
+  const [faculties, setFaculties] = useState([]);
+  const [departmans, setDepartmans] = useState([]);
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
   const navigation = useNavigation();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    firestore().collection('faculties')
+    firestore().collection("faculties")
       .onSnapshot((docs) => {
-        let facultiess = []
+        let facultiess = [];
         docs.forEach(doc => {
           facultiess.push({
             uid: doc.id,
-            name:  doc.data().name
-          })
-        })
-        setFaculties(facultiess)
-      })
-  }, [])
+            name: doc.data().name,
+          });
+        });
+        setFaculties(facultiess);
+      });
+  }, []);
 
   useEffect(() => {
-    firestore().collection('faculties')
+    firestore().collection("faculties")
       .doc(faculty)
-      .collection('departmans')
+      .collection("departmans")
       .onSnapshot(docs => {
-        let departmanss = []
+        let departmanss = [];
         docs.forEach(doc => {
           departmanss.push({
             uid: doc.id,
-            name: doc.data().name
-          })
-        })
-        setDepartmans(departmanss)
-      })
-  }, [faculty])
+            name: doc.data().name,
+          });
+        });
+        setDepartmans(departmanss);
+      });
+  }, [faculty]);
 
   const createAccount = async () => {
     setIsLoading(true);
@@ -90,15 +90,15 @@ const SignUp = () => {
         faculty,
         departmant,
         profilePhoto: null,
-        type: 0
+        type: 0,
       });
 
-      await firestore().collection('users').doc(response.user.uid).collection('appeals').doc('deneme').set({deneme: 'deneme'})
-      await firestore().collection('users').doc(response.user.uid).collection('appeals').doc('deneme').delete()
-      if(fileX[0].name !== null) await uploadFile('x', studentNumber, name, response.user.uid)
+      await firestore().collection("users").doc(response.user.uid).collection("appeals").doc("deneme").set({ deneme: "deneme" });
+      await firestore().collection("users").doc(response.user.uid).collection("appeals").doc("deneme").delete();
+      if (fileX[0].name !== null) await uploadFile("x", studentNumber, name, response.user.uid);
       setIsLoading(false);
       await auth().signInWithEmailAndPassword(email, password);
-      dispatch(userAuthChange())
+      dispatch(userAuthChange());
     } catch (e) {
       setIsLoading(false);
       setError(e.message);
@@ -197,7 +197,7 @@ const SignUp = () => {
       await firestore().collection("users")
         .doc(auth().currentUser.uid)
         .set({
-            profilePhoto: fileName,
+          profilePhoto: fileName,
         }, { merge: true }).then(() => {
           setFileX([{ name: fileName, uri: null }]);
           setIsUploadedFileX([{ name: fileName }]);
@@ -215,75 +215,75 @@ const SignUp = () => {
         )}
 
         <TextInput key={0}
-          label="Öğrenci Numarası"
-          value={studentNumber}
-          onChangeText={(text) => setStudentNumber(text)}
-          keyboardType="numeric"
+                   label="Öğrenci Numarası"
+                   value={studentNumber}
+                   onChangeText={(text) => setStudentNumber(text)}
+                   keyboardType="numeric"
         />
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
           <TextInput key={1}
-            label="Şifre"
-            style={{ width: "45%", marginTop: 12 }}
-            value={password}
-            onChangeText={(text) => setPassword(text)}
-            secureTextEntry
+                     label="Şifre"
+                     style={{ width: "45%", marginTop: 12 }}
+                     value={password}
+                     onChangeText={(text) => setPassword(text)}
+                     secureTextEntry
           />
           <TextInput key={2}
-            label="Şifre Tekrar"
-            style={{ width: "50%", marginTop: 12 }}
-            value={passwordAgain}
-            onChangeText={(text) => setPasswordAgain(text)}
-            secureTextEntry
+                     label="Şifre Tekrar"
+                     style={{ width: "50%", marginTop: 12 }}
+                     value={passwordAgain}
+                     onChangeText={(text) => setPasswordAgain(text)}
+                     secureTextEntry
           />
         </View>
         <TextInput key={3}
-          label="Email"
-          style={{ marginTop: 12 }}
-          value={email}
-          onChangeText={(text) => setEmail(text)}
-          keyboardType="email-address"
+                   label="Email"
+                   style={{ marginTop: 12 }}
+                   value={email}
+                   onChangeText={(text) => setEmail(text)}
+                   keyboardType="email-address"
         />
         <TextInput key={4}
-          label="Ad Soyad"
-          style={{ marginTop: 12 }}
-          value={name}
-          onChangeText={(text) => setName(text)}
+                   label="Ad Soyad"
+                   style={{ marginTop: 12 }}
+                   value={name}
+                   onChangeText={(text) => setName(text)}
         />
 
         <TextInput key={5}
-          style={{ marginTop: 18 }}
-          label=""
-          render={props =>
-            <PhoneInput
-              style={{ marginTop: 24, marginLeft: 12 }}
-              initialCountry={"tr"}
-              onChangePhoneNumber={onPhoneInputChange}
-              textProps={{
-                placeholder: "Telefon numarası giriniz..",
-              }}
-            />
-          }
+                   style={{ marginTop: 18 }}
+                   label=""
+                   render={props =>
+                     <PhoneInput
+                       style={{ marginTop: 24, marginLeft: 12 }}
+                       initialCountry={"tr"}
+                       onChangePhoneNumber={onPhoneInputChange}
+                       textProps={{
+                         placeholder: "Telefon numarası giriniz..",
+                       }}
+                     />
+                   }
         />
 
         <TextInput key={6}
-          label="TC Kimlik No"
-          style={{ marginTop: 18 }}
-          value={countryIdentifier}
-          onChangeText={(text) => setCountryIdentifier(text)}
-          keyboardType="numeric"
-          maxLength={11}
+                   label="TC Kimlik No"
+                   style={{ marginTop: 18 }}
+                   value={countryIdentifier}
+                   onChangeText={(text) => setCountryIdentifier(text)}
+                   keyboardType="numeric"
+                   maxLength={11}
         />
         <TextInput key={7}
-          label="Adres"
-          style={{ marginTop: 12 }}
-          value={adres}
-          onChangeText={(text) => setAdres(text)}
+                   label="Adres"
+                   style={{ marginTop: 12 }}
+                   value={adres}
+                   onChangeText={(text) => setAdres(text)}
         />
         <SelectPicker key={8}
-          style={styles.list}
-          onValueChange={(value) => setOgrSinif(value) }
-          selected={ogrSinif}
-          placeholder="Sınıf"
+                      style={styles.list}
+                      onValueChange={(value) => setOgrSinif(value)}
+                      selected={ogrSinif}
+                      placeholder="Sınıf"
         >
           <SelectPicker.Item label="1" value="1" key="1" />
           <SelectPicker.Item label="2" value="2" key="2" />
@@ -303,21 +303,21 @@ const SignUp = () => {
           {/* The date picker */}
           {isPickerShow && (
             <DateTimePicker key={9}
-              value={selectedDate}
-              mode={"date"}
-              is24Hour={true}
-              onChange={onChange}
-              minimumDate={new Date(1950, 1, 1)}
-              maximumDate={new Date(2020, 12, 31)}
+                            value={selectedDate}
+                            mode={"date"}
+                            is24Hour={true}
+                            onChange={onChange}
+                            minimumDate={new Date(1950, 1, 1)}
+                            maximumDate={new Date(2020, 12, 31)}
             />
           )}
         </View>
 
         <SelectPicker key={10}
-          style={styles.list}
-          onValueChange={(value) => setFaculty(value)}
-          selected={faculty}
-          placeholder="Fakülte"
+                      style={styles.list}
+                      onValueChange={(value) => setFaculty(value)}
+                      selected={faculty}
+                      placeholder="Fakülte"
         >
           {faculties.map((faculty) => (
             <SelectPicker.Item label={faculty.name} value={faculty.uid} key={faculty.uid} />
@@ -325,10 +325,10 @@ const SignUp = () => {
         </SelectPicker>
 
         <SelectPicker key={11}
-          style={styles.list}
-          onValueChange={(value) => setDepartmant(value)}
-          selected={departmant}
-          placeholder="Bölüm"
+                      style={styles.list}
+                      onValueChange={(value) => setDepartmant(value)}
+                      selected={departmant}
+                      placeholder="Bölüm"
         >
           {departmans.map(departman => (
             <SelectPicker.Item label={departman.name} value={departman.uid} key={departman.uid} />
@@ -372,17 +372,17 @@ const SignUp = () => {
             style={{ width: "100%", paddingTop: 6, paddingBottom: 6 }}
             theme={{ roundness: 3 }}
             mode="contained"
-            disabled={ studentNumber === ""
-                    || name === ""
-                    || email === ""
-                    || password === ""
-                    || passwordAgain === ""
-                    || phoneNumber === ""
-                    || countryIdentifier === ""
-                    || adres === ""
-                    || ogrSinif === ""
-                    || faculty === ""
-                    || departmant === ""}
+            disabled={studentNumber === ""
+            || name === ""
+            || email === ""
+            || password === ""
+            || passwordAgain === ""
+            || phoneNumber === ""
+            || countryIdentifier === ""
+            || adres === ""
+            || ogrSinif === ""
+            || faculty === ""
+            || departmant === ""}
             onPress={() => createAccount()}
             loading={isLoading}
           >

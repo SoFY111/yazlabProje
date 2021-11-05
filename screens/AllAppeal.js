@@ -9,7 +9,7 @@ import { useNavigation } from "@react-navigation/core";
 
 const AllAppeal = () => {
 
-  const navigation = useNavigation()
+  const navigation = useNavigation();
   const [appeals, setAppeals] = useState([]);
 
   useEffect(() => {
@@ -82,7 +82,7 @@ const AllAppeal = () => {
 
 
   return (
-    <View style={{paddingVertical:6 }}>
+    <View style={{ paddingVertical: 6 }}>
       <View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <Button compact mode="contained" style={{ backgroundColor: "#FFC107" }} onPress={() => getWaitingAppeal()}>
@@ -102,11 +102,11 @@ const AllAppeal = () => {
         </ScrollView>
       </View>
       <ScrollView>
-        <View style={{alignItems:"center"}}>
-          <Subheading style={{fontSize: 10}}> '!' işareti olanlar tamamlanmamış başvurudur.</Subheading>
+        <View style={{ alignItems: "center" }}>
+          <Subheading style={{ fontSize: 10 }}> '!' işareti olanlar tamamlanmamış başvurudur.</Subheading>
         </View>
         {appeals.length > 0 && appeals.map((appeal) => (
-          <View key={appeal.appealUUID} style={{ flexDirection: "row", alignItems: "center", padding: 6}}>
+          <View key={appeal.appealUUID} style={{ flexDirection: "row", alignItems: "center", padding: 6 }}>
             <View>
               {appeal.isStart === 2 ?
                 <Icon name="alert" type="ionicon" color="red" size={14} />
@@ -121,7 +121,8 @@ const AllAppeal = () => {
               alignItems: "center",
               padding: 6,
             }}>
-              <Text style={{flex:1}}>{appeal.appealType === 0 ? "ÇAP Başvurusu" : appeal.appealType === 1 ? "DGS Başvurusu" : appeal.appealType === 2 ? "Yatay Geçiş Başvurusu" : appeal.appealType === 3 ? "Yaz Okulu" : "Ders İntibak Başvurusu"}</Text>
+              <Text
+                style={{ flex: 1 }}>{appeal.appealType === 0 ? "ÇAP Başvurusu" : appeal.appealType === 1 ? "DGS Başvurusu" : appeal.appealType === 2 ? "Yatay Geçiş Başvurusu" : appeal.appealType === 3 ? "Yaz Okulu" : "Ders İntibak Başvurusu"}</Text>
               <Pressable onPress={() => navigation.navigate("StudentAppealDetail", { appealUUID: appeal?.appealUUID })}>
                 <Icon name="eye" type="ionicon" color="#5AA658" size={14} />
               </Pressable>

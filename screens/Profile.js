@@ -21,8 +21,8 @@ const Settings = () => {
     dispatch(userAuthChange());
   };
 
-  const [fileX, setFileX] = useState([{name: null, uri: null}])
-  const [fileUploadedLoader ,setFileUploadedLoader] = useState(false)
+  const [fileX, setFileX] = useState([{ name: null, uri: null }]);
+  const [fileUploadedLoader, setFileUploadedLoader] = useState(false);
   const [userUID, setUserUID] = useState();
   const [userData, setUserData] = useState([]);
   const [email, setEmail] = useState("");
@@ -30,8 +30,8 @@ const Settings = () => {
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [isEdit, setIsEdit] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [userFaculty, setUserFaculty] = useState('')
-  const [userDepartmant, setUserDepartmant] = useState('')
+  const [userFaculty, setUserFaculty] = useState("");
+  const [userDepartmant, setUserDepartmant] = useState("");
 
   const [newName, setNewName] = useState("");
   const [newStudentNumber, setNewStudentNumber] = useState("");
@@ -77,83 +77,79 @@ const Settings = () => {
 
 
   const updateData = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     if (isEdit === "name") {
       try {
-        await firestore().collection('users')
+        await firestore().collection("users")
           .doc(auth().currentUser.uid)
           .set({
-            name: newName
-          }, {merge: true})
-      }catch (e) {
-        console.log(e.message)
+            name: newName,
+          }, { merge: true });
+      } catch (e) {
+        console.log(e.message);
       }
-    }
-    else if (isEdit === "studentNumber") {
+    } else if (isEdit === "studentNumber") {
       try {
-        await firestore().collection('users')
+        await firestore().collection("users")
           .doc(auth().currentUser.uid)
           .set({
-            studentNumber: newStudentNumber
-          }, {merge: true})
-      }catch (e) {
-        console.log(e.message)
+            studentNumber: newStudentNumber,
+          }, { merge: true });
+      } catch (e) {
+        console.log(e.message);
       }
 
-    }
-    else if (isEdit === "countryIdentifier") {
+    } else if (isEdit === "countryIdentifier") {
       try {
-        await firestore().collection('users')
+        await firestore().collection("users")
           .doc(auth().currentUser.uid)
           .set({
-            countryIdentifier: newCountryIdentifier
-          }, {merge: true})
-      }catch (e) {
-        console.log(e.message)
+            countryIdentifier: newCountryIdentifier,
+          }, { merge: true });
+      } catch (e) {
+        console.log(e.message);
       }
 
-    }
-    else if (isEdit === "adres") {
+    } else if (isEdit === "adres") {
       try {
-        await firestore().collection('users')
+        await firestore().collection("users")
           .doc(auth().currentUser.uid)
           .set({
-            adres: newAdres
-          }, {merge: true})
-      }catch (e) {
-        console.log(e.message)
+            adres: newAdres,
+          }, { merge: true });
+      } catch (e) {
+        console.log(e.message);
       }
 
-    }
-    else if (isEdit === "phoneNumber") {
+    } else if (isEdit === "phoneNumber") {
       try {
-        await firestore().collection('users')
+        await firestore().collection("users")
           .doc(auth().currentUser.uid)
           .set({
-            phoneNumber: newPhoneNumber
-          }, {merge: true})
+            phoneNumber: newPhoneNumber,
+          }, { merge: true });
 
-      }catch (e) {
-        console.log(e.message)
+      } catch (e) {
+        console.log(e.message);
       }
 
     }
-    setIsDialogVisible(false)
-    setIsLoading(false)
+    setIsDialogVisible(false);
+    setIsLoading(false);
   };
 
   const deleteProfilePhoto = async () => {
-    try{
-      await firestore().collection('users')
+    try {
+      await firestore().collection("users")
         .doc(auth().currentUser.uid)
         .set({
-          profilePhoto: null
-        }, {merge: true})
+          profilePhoto: null,
+        }, { merge: true });
       await storage().ref("/images/userProfilePicture/" + userData?.profilePhoto).delete();
-    }catch (e){
+    } catch (e) {
       //console.log(e.message)
     }
-  }
+  };
 
   const docPicker = async () => {
     setFileX([{}]);
@@ -215,7 +211,7 @@ const Settings = () => {
       if (type === "x") await firestore().collection("users")
         .doc(auth().currentUser.uid)
         .set({
-          profilePhoto: fileName
+          profilePhoto: fileName,
         }, { merge: true }).then(() => {
           setFileX([{ name: fileName, uri: null }]);
           setFileUploadedLoader(true);
@@ -230,7 +226,7 @@ const Settings = () => {
 
 
   const deleteFile = async (type, fileName) => {
-    setFileX({name: null, uri: null})
+    setFileX({ name: null, uri: null });
   };
 
 
@@ -249,27 +245,27 @@ const Settings = () => {
           <Button compact onPress={() => deleteProfilePhoto()} disabled={userData?.profilePhoto === null}>
             <Text>Fotoğrafı Kaldır</Text>
           </Button>
-            <TouchableOpacity
-              onPress={() => docPicker("x")}
-            >
-              {fileX[0]?.name ? fileX.map(({ name, uri }) => {
-                  return (
-                    <View style={{ flexDirection: "column", alignItems: "center", justifyContent: "space-between" }}>
-                      <Text>{name.length > 25 ? name.substring(0, 22) + "..." : name}</Text>
-                      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-                        <TouchableOpacity style={{ marginLeft: 18 }}
-                                          onPress={() => deleteFile("x", name)}>
-                          <Icon name="close" type="ionicon" />
-                        </TouchableOpacity>
-                        <Button style={{ marginLeft: 4 }} mode="contained"
-                                onPress={async () => await uploadFile("x")}><Text
-                          style={{ color: "#fff" }}>Yükle</Text></Button>
-                      </View>
+          <TouchableOpacity
+            onPress={() => docPicker("x")}
+          >
+            {fileX[0]?.name ? fileX.map(({ name, uri }) => {
+                return (
+                  <View style={{ flexDirection: "column", alignItems: "center", justifyContent: "space-between" }}>
+                    <Text>{name.length > 25 ? name.substring(0, 22) + "..." : name}</Text>
+                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                      <TouchableOpacity style={{ marginLeft: 18 }}
+                                        onPress={() => deleteFile("x", name)}>
+                        <Icon name="close" type="ionicon" />
+                      </TouchableOpacity>
+                      <Button style={{ marginLeft: 4 }} mode="contained"
+                              onPress={async () => await uploadFile("x")}><Text
+                        style={{ color: "#fff" }}>Yükle</Text></Button>
                     </View>
-                  );
-                }) :
-                <Text style={{ textAlign: "center" }}>{'Yeni Fotoğraf Seç'.toLocaleUpperCase()}</Text>}
-            </TouchableOpacity>
+                  </View>
+                );
+              }) :
+              <Text style={{ textAlign: "center" }}>{"Yeni Fotoğraf Seç".toLocaleUpperCase()}</Text>}
+          </TouchableOpacity>
         </View>
 
         <View style={styles.container}>
@@ -343,10 +339,10 @@ const Settings = () => {
                   isEdit === "adres" ?
                     "Adres"
                     :
-                  isEdit === "phoneNumber" ?
-                    "Telefon Numarası"
-                    :
-                    ""
+                    isEdit === "phoneNumber" ?
+                      "Telefon Numarası"
+                      :
+                      ""
           } Güncelle</Dialog.Title>
           <Dialog.Content>
             {isEdit === "name" ?
@@ -364,23 +360,23 @@ const Settings = () => {
                     <TextInput label={userData?.adres} value={newAdres}
                                onChangeText={(text) => setNewAdres(text)} />
                     :
-                  isEdit === "phoneNumber" ?
-                    <TextInput key={5}
-                               style={{ marginTop: 18 }}
-                               label=""
-                               render={props =>
-                                 <PhoneInput
-                                   style={{ marginTop: 24, marginLeft: 12 }}
-                                   initialCountry={"tr"}
-                                   onChangePhoneNumber={onPhoneInputChange}
-                                   textProps={{
-                                     placeholder: userData?.phoneNumber?.phoneInputValue.substr(3, userData?.phoneNumber?.phoneInputValue.length),
-                                   }}
-                                 />
-                               }
-                    />
-                    :
-                    <Text>Başka</Text>
+                    isEdit === "phoneNumber" ?
+                      <TextInput key={5}
+                                 style={{ marginTop: 18 }}
+                                 label=""
+                                 render={props =>
+                                   <PhoneInput
+                                     style={{ marginTop: 24, marginLeft: 12 }}
+                                     initialCountry={"tr"}
+                                     onChangePhoneNumber={onPhoneInputChange}
+                                     textProps={{
+                                       placeholder: userData?.phoneNumber?.phoneInputValue.substr(3, userData?.phoneNumber?.phoneInputValue.length),
+                                     }}
+                                   />
+                                 }
+                      />
+                      :
+                      <Text>Başka</Text>
             }
           </Dialog.Content>
           <Dialog.Actions>

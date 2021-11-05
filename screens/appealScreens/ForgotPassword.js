@@ -25,9 +25,9 @@ const ForgotPassword = () => {
         });
 
       try {
-        if (!userData) await auth().sendPasswordResetEmail(email).then(() => navigation.navigate('SignIn'));
+        if (!userData) await auth().sendPasswordResetEmail(email).then(() => navigation.navigate("SignIn"));
       } catch (e) {
-        setError('Böyle bir kullanıcı yok. İletişime geçin. Error: 452.');
+        setError("Böyle bir kullanıcı yok. İletişime geçin. Error: 452.");
         console.log(e.message);
       }
     } catch (e) {
@@ -52,7 +52,8 @@ const ForgotPassword = () => {
         onChangeText={(text) => setCountryIdentifier(text)}
         keyboardType="numeric"
       />
-      <Button mode="contained" style={{ marginTop: 12 }} disabled={!email || !countryIdentifier} onPress={async () => await forgotPassword()}>
+      <Button mode="contained" style={{ marginTop: 12 }} disabled={!email || !countryIdentifier}
+              onPress={async () => await forgotPassword()}>
         <Text style={{ color: "#fff" }}>Sıfırla</Text>
       </Button>
     </View>

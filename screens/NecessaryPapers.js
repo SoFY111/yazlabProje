@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Button } from "react-native-paper";
 import { Icon } from "react-native-elements";
@@ -23,29 +23,29 @@ const NecessaryPapers = () => {
 
 
   const navigation = useNavigation();
-  const declareAppealType = useRoute().params.type //Başvuru tipini tanımla (0, 1, 2, 3, 4 durumu .app.config.txt dosyasında belirtildi)
+  const declareAppealType = useRoute().params.type; //Başvuru tipini tanımla (0, 1, 2, 3, 4 durumu .app.config.txt dosyasında belirtildi)
 
 
   //Eğer yarım kalan bi başvuru varsa oraya yönlendir.
-  useEffect( ()  => {
-    console.log('appealType: ' + declareAppealType)
-    firestore().collection('users')
+  useEffect(() => {
+    console.log("appealType: " + declareAppealType);
+    firestore().collection("users")
       .doc(auth().currentUser.uid)
-      .collection('appeals')
+      .collection("appeals")
       .get()
       .then(querySnapshot => {
         querySnapshot.docs.map(doc => {
           //console.log(doc.data())
-          if(doc.data()?.appealType === declareAppealType && doc.data()?.isStart === 2){
-            if(declareAppealType === 0) navigation.navigate('DoubleMajorAppealScreen', {appealUUID: doc.data()?.appealUUID});
-            else if(declareAppealType === 1) navigation.navigate('VerticalAppealScreen', {appealUUID: doc.data()?.appealUUID});
-            else if(declareAppealType === 2) navigation.navigate('HorizontalAppealScreen', {appealUUID: doc.data()?.appealUUID});
-            else if(declareAppealType === 3) navigation.navigate('SummerSchoolAppealScreen', {appealUUID: doc.data()?.appealUUID});
-            else if(declareAppealType === 4) navigation.navigate('ClassAdaptationAppealScreen', {appealUUID: doc.data()?.appealUUID});
+          if (doc.data()?.appealType === declareAppealType && doc.data()?.isStart === 2) {
+            if (declareAppealType === 0) navigation.navigate("DoubleMajorAppealScreen", { appealUUID: doc.data()?.appealUUID });
+            else if (declareAppealType === 1) navigation.navigate("VerticalAppealScreen", { appealUUID: doc.data()?.appealUUID });
+            else if (declareAppealType === 2) navigation.navigate("HorizontalAppealScreen", { appealUUID: doc.data()?.appealUUID });
+            else if (declareAppealType === 3) navigation.navigate("SummerSchoolAppealScreen", { appealUUID: doc.data()?.appealUUID });
+            else if (declareAppealType === 4) navigation.navigate("ClassAdaptationAppealScreen", { appealUUID: doc.data()?.appealUUID });
           }
-        })
-      })
-  }, [])
+        });
+      });
+  }, []);
 
   const clickNextButton = async () => {
     let startedAppealUUID;
@@ -53,28 +53,28 @@ const NecessaryPapers = () => {
     const appealType = declareAppealType;
     try {
 
-      await firestore().collection('users')
+      await firestore().collection("users")
         .doc(auth().currentUser.uid)
-        .collection('appeals')
+        .collection("appeals")
         .get()
         .then(querySnapshot => {
           querySnapshot.docs.map(doc => {
-            if(doc.data()?.appealType === appealType && doc.data()?.isStart === 2){
+            if (doc.data()?.appealType === appealType && doc.data()?.isStart === 2) {
               startedAppealUUID = doc.data()?.appealUUID;
             }
-          })
+          });
         })
         .then(() => {
-          firestore().collection('users')
+          firestore().collection("users")
             .doc(auth().currentUser.uid)
-            .collection('appeals')
+            .collection("appeals")
             .doc(startedAppealUUID)
-            .delete()
-        })
+            .delete();
+        });
 
-      await firestore().collection('adminAppeals')
+      await firestore().collection("adminAppeals")
         .doc(startedAppealUUID)
-        .delete()
+        .delete();
 
       await firestore().collection("users")
         .doc(auth().currentUser.uid)
@@ -84,38 +84,37 @@ const NecessaryPapers = () => {
           appealType,
           isStart: 2,
           percent: 0,
-          files:{},
-          result:{
+          files: {},
+          result: {
             status: 2,
-            description: null
+            description: null,
           },
-          createdAt: Date.now()
+          createdAt: Date.now(),
         }, { merge: true });
 
-      await firestore().collection('adminAppeals')
+      await firestore().collection("adminAppeals")
         .doc(appealUUID)
         .set({
           appealUUID,
-          user:{
+          user: {
             id: auth().currentUser.uid,
-            name: auth().currentUser.displayName
+            name: auth().currentUser.displayName,
           },
           appealType,
           isStart: 2,
-          result:{
-            status:2,
-            description: null
-          }
-        }, {merge: true})
+          result: {
+            status: 2,
+            description: null,
+          },
+        }, { merge: true });
 
-      if(appealType === 0) navigation.navigate('DoubleMajorAppealScreen', {appealUUID: appealUUID});
-      else if(appealType === 1) navigation.navigate('VerticalAppealScreen', {appealUUID: appealUUID});
-      else if(appealType === 2) navigation.navigate('HorizontalAppealScreen', {appealUUID: appealUUID});
-      else if(appealType === 3) navigation.navigate('SummerSchoolAppealScreen', {appealUUID: appealUUID});
-      else if(appealType === 4) navigation.navigate('ClassAdaptationAppealScreen', {appealUUID: appealUUID});
-    }
-    catch (e){
-      console.log(e.message)
+      if (appealType === 0) navigation.navigate("DoubleMajorAppealScreen", { appealUUID: appealUUID });
+      else if (appealType === 1) navigation.navigate("VerticalAppealScreen", { appealUUID: appealUUID });
+      else if (appealType === 2) navigation.navigate("HorizontalAppealScreen", { appealUUID: appealUUID });
+      else if (appealType === 3) navigation.navigate("SummerSchoolAppealScreen", { appealUUID: appealUUID });
+      else if (appealType === 4) navigation.navigate("ClassAdaptationAppealScreen", { appealUUID: appealUUID });
+    } catch (e) {
+      console.log(e.message);
       navigation.goBack();
     }
   };

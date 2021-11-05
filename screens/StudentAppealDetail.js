@@ -402,11 +402,11 @@ const StudentAppealDetail = () => {
       }
 
       {appealDetail?.result?.status !== 2 ?
-        <View style={{justifyContent:"center", alignContent:"center", alignItems:"center", marginTop:25}}>
-          <Title style={{fontSize: 26}}>Başvuru Sonucu</Title>
+        <View style={{ justifyContent: "center", alignContent: "center", alignItems: "center", marginTop: 25 }}>
+          <Title style={{ fontSize: 26 }}>Başvuru Sonucu</Title>
           <Text>{appealDetail?.result?.description}</Text>
         </View>
-        : <></> }
+        : <></>}
 
     </View>
   );

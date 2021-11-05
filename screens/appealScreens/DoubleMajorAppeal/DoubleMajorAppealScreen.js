@@ -38,7 +38,7 @@ const DoubleMajorAppealScreen = () => {
   const [percentCounter, setPercentCounter] = useState(0);
   const [userData, setUserData] = useState(null);
   const [appealUUID, setAppealUUID] = useState(useRoute().params?.appealUUID);
-  const navigation = useNavigation()
+  const navigation = useNavigation();
 
   useEffect(() => {
 
@@ -169,13 +169,13 @@ const DoubleMajorAppealScreen = () => {
         .collection("appeals")
         .doc(appealUUID)
         .set({
-          percent: (percentCounter+1)/4*100,
+          percent: (percentCounter + 1) / 4 * 100,
           files: {
             fileX: fileName,
           },
         }, { merge: true }).then(() => {
-          setPercentCounter(percentCounter + 1)
-          setFileXisLoading(false)
+          setPercentCounter(percentCounter + 1);
+          setFileXisLoading(false);
           setFileX([{ name: fileName, uri: null }]);
           setIsUploadedFileX([{ name: fileName }]);
           setFileUploadedLoader(true);
@@ -188,13 +188,13 @@ const DoubleMajorAppealScreen = () => {
         .collection("appeals")
         .doc(appealUUID)
         .set({
-          percent: (percentCounter+1)/4*100,
+          percent: (percentCounter + 1) / 4 * 100,
           files: {
             fileY: fileName,
           },
         }, { merge: true }).then(() => {
-          setPercentCounter(percentCounter + 1)
-          setFileYisLoading(false)
+          setPercentCounter(percentCounter + 1);
+          setFileYisLoading(false);
           setFileY([{ name: fileName, uri: null }]);
           setIsUploadedFileY([{ name: fileName }]);
           setFileUploadedLoader(true);
@@ -207,13 +207,13 @@ const DoubleMajorAppealScreen = () => {
         .collection("appeals")
         .doc(appealUUID)
         .set({
-          percent: (percentCounter+1)/4*100,
+          percent: (percentCounter + 1) / 4 * 100,
           files: {
             fileZ: fileName,
           },
         }, { merge: true }).then(() => {
-          setPercentCounter(percentCounter + 1)
-          setFileZisLoading(false)
+          setPercentCounter(percentCounter + 1);
+          setFileZisLoading(false);
           setFileZ([{ name: fileName, uri: null }]);
           setIsUploadedFileZ([{ name: fileName }]);
           setFileUploadedLoader(true);
@@ -226,13 +226,13 @@ const DoubleMajorAppealScreen = () => {
         .collection("appeals")
         .doc(appealUUID)
         .set({
-          percent: ((percentCounter+1)/4*100),
+          percent: ((percentCounter + 1) / 4 * 100),
           files: {
             fileQ: fileName,
           },
         }, { merge: true }).then(() => {
-          setPercentCounter(percentCounter + 1)
-          setFileQisLoading(false)
+          setPercentCounter(percentCounter + 1);
+          setFileQisLoading(false);
           setFileQ([{ name: fileName, uri: null }]);
           setIsUploadedFileQ([{ name: fileName }]);
           setFileUploadedLoader(true);
@@ -249,7 +249,7 @@ const DoubleMajorAppealScreen = () => {
             fileF: fileName,
           },
         }, { merge: true }).then(() => {
-          setFileFisLoading(false)
+          setFileFisLoading(false);
           setFileF([{ name: fileName, uri: null }]);
           setIsUploadedFileQ([{ name: fileName }]);
           setFileUploadedLoader(true);
@@ -281,7 +281,7 @@ const DoubleMajorAppealScreen = () => {
                 .collection("appeals")
                 .doc(appealUUID)
                 .set({
-                  percent: (percentCounter - 1)/4*100,
+                  percent: (percentCounter - 1) / 4 * 100,
                   files: {
                     fileX: null,
                   },
@@ -296,7 +296,7 @@ const DoubleMajorAppealScreen = () => {
                 .collection("appeals")
                 .doc(appealUUID)
                 .set({
-                  percent: (percentCounter - 1)/4*100,
+                  percent: (percentCounter - 1) / 4 * 100,
                   files: {
                     fileY: null,
                   },
@@ -311,7 +311,7 @@ const DoubleMajorAppealScreen = () => {
                 .collection("appeals")
                 .doc(appealUUID)
                 .set({
-                  percent: (percentCounter - 1)/4*100,
+                  percent: (percentCounter - 1) / 4 * 100,
                   files: {
                     fileZ: null,
                   },
@@ -326,7 +326,7 @@ const DoubleMajorAppealScreen = () => {
                 .collection("appeals")
                 .doc(appealUUID)
                 .set({
-                  percent: (percentCounter - 1)/4*100,
+                  percent: (percentCounter - 1) / 4 * 100,
                   files: {
                     fileQ: null,
                   },
@@ -364,26 +364,25 @@ const DoubleMajorAppealScreen = () => {
 
   const finishAppeal = async () => {
     try {
-      await firestore().collection('users')
+      await firestore().collection("users")
         .doc(auth().currentUser.uid)
-        .collection('appeals')
+        .collection("appeals")
         .doc(appealUUID)
         .set({
           isStart: 1,
-          percent: 100
-        }, {merge: true})
+          percent: 100,
+        }, { merge: true });
 
-      await firestore().collection('adminAppeals')
+      await firestore().collection("adminAppeals")
         .doc(appealUUID)
         .set({
           isStart: 1,
-        }, {merge: true})
+        }, { merge: true });
+    } catch (e) {
+      console.log(e.message);
     }
-    catch (e) {
-      console.log(e.message)
-    }
-    navigation.navigate('Applications')
-  }
+    navigation.navigate("Applications");
+  };
 
   return (
     <View style={styles.container}>
@@ -632,9 +631,9 @@ const DoubleMajorAppealScreen = () => {
                       </TouchableOpacity>
                       <Button style={{ marginLeft: 4 }} mode="contained" loading={fileXisLoading}
                               onPress={async () => {
-                                  setFileXisLoading(true);
-                                  await uploadFile("x");
-                                }
+                                setFileXisLoading(true);
+                                await uploadFile("x");
+                              }
                               }><Text
                         style={{ color: "#fff" }}>Yükle</Text></Button>
                     </View>
@@ -666,7 +665,7 @@ const DoubleMajorAppealScreen = () => {
                       </TouchableOpacity>
                       <Button style={{ marginLeft: 4 }} mode="contained" loading={fileYisLoading}
                               onPress={async () => {
-                                setFileYisLoading(true)
+                                setFileYisLoading(true);
                                 await uploadFile("y");
                               }}><Text
                         style={{ color: "#fff" }}>Yükle</Text></Button>
@@ -698,7 +697,7 @@ const DoubleMajorAppealScreen = () => {
                       </TouchableOpacity>
                       <Button style={{ marginLeft: 4 }} mode="contained" loading={fileZisLoading}
                               onPress={async () => {
-                                setFileZisLoading(true)
+                                setFileZisLoading(true);
                                 await uploadFile("z");
                               }}><Text
                         style={{ color: "#fff" }}>Yükle</Text></Button>
@@ -731,7 +730,7 @@ const DoubleMajorAppealScreen = () => {
                         </TouchableOpacity>
                         <Button style={{ marginLeft: 4 }} mode="contained" loading={fileQisLoading}
                                 onPress={async () => {
-                                  setFileQisLoading(true)
+                                  setFileQisLoading(true);
                                   await uploadFile("q");
                                 }}><Text
                           style={{ color: "#fff" }}>Yükle</Text></Button>
@@ -764,7 +763,7 @@ const DoubleMajorAppealScreen = () => {
                       </TouchableOpacity>
                       <Button style={{ marginLeft: 4 }} mode="contained" loading={fileFisLoading}
                               onPress={async () => {
-                                setFileFisLoading(true)
+                                setFileFisLoading(true);
                                 await uploadFile("f");
                               }}><Text
                         style={{ color: "#fff" }}>Yükle</Text></Button>
@@ -826,9 +825,9 @@ const styles = StyleSheet.create({
   scv: {
     flex: 1,
     borderWidth: 1,
-    borderColor: 'rgba(0,0,0, .2)',
-    borderRadius:4,
-    padding:8,
+    borderColor: "rgba(0,0,0, .2)",
+    borderRadius: 4,
+    padding: 8,
   },
   nextButtonContainer: {
     flexDirection: "row",

@@ -136,7 +136,7 @@ const Application = () => {
                   <View>
                     <Icon name="checkmark" type="ionicon" color="#5AA658" size={14} />
                   </View>
-                  <View  style={{
+                  <View style={{
                     flexDirection: "row",
                     flex: 1,
                     justifyContent: "space-between",
