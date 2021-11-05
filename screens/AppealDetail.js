@@ -530,7 +530,7 @@ const AppealDetail = () => {
 
         <View style={{ padding: 24 }}>
           <TextInput label={appealStatus !== 2 ? "Açıklama" : appealDescription}
-                     value={appealStatus !== 2 ? appealDescription : description} disabled={appealStatus === 2}
+                     value={appealStatus !== 2 ? appealDescription : description} disabled={appealStatus !== 2}
                      onChangeText={(text) => setDescription(text)} />
         </View>
 
