@@ -15,3 +15,10 @@
     1: BAŞVURU TAMAMLANDI
     2: BAŞVURU DEVAM EDİYOR
 }
+
+{
+    result:
+        0: RED
+        1: KABUL
+        2: BAKILMADI
+}

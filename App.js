@@ -20,6 +20,7 @@ import SignUp from "./screens/SignUp";
 import Profile from "./screens/Profile";
 import Applications from "./screens/Applications";
 
+import AppealDetail from "./screens/AppealDetail";
 import DoubleMajorAppealScreen from "./screens/appealScreens/DoubleMajorAppeal/DoubleMajorAppealScreen";
 import VerticalAppealScreen from "./screens/appealScreens/VerticalAppeal/VerticalAppealScreen";
 import HorizontalAppealScreen from "./screens/appealScreens/HorizontalAppeal/HorizontalAppealScreen";
@@ -53,6 +54,7 @@ const ApplicationStackScreen = () => {
     <ApplicationStack.Navigator>
       <ApplicationStack.Screen name="Applications" component={Applications}
                            options={{ title: "BAŞVURULAR", headerTitleAlign: "center" }} />
+      <ApplicationStack.Screen name="AppealDetail" component={AppealDetail} options={{title:'Başvuru Detayları', headerTitleAlign:'center'}}/>
       <ApplicationStack.Screen name="NecessaryPapers" component={NecessaryPapers} options={{title:'Gerekli Evraklar', headerTitleAlign:'center'}}/>
       <ApplicationStack.Screen name="DoubleMajorAppealScreen" component={DoubleMajorAppealScreen} options={{title:'Çap Başvuru', headerTitleAlign:'center'}}/>
       <ApplicationStack.Screen name="VerticalAppealScreen" component={VerticalAppealScreen} options={{title:'Dikey Geçiş Başvuru', headerTitleAlign:'center'}}/>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { Button, Button as MUIButton, Text } from "react-native-paper";
 
 import firestore from "@react-native-firebase/firestore";
@@ -8,6 +8,7 @@ import auth from "@react-native-firebase/auth";
 import { useNavigation } from "@react-navigation/core";
 
 import { useDispatch, useSelector } from "react-redux";
+import { Icon } from "react-native-elements";
 
 const Application = () => {
   const [allUserId, setAllUserId] = useState([]);
@@ -30,7 +31,7 @@ const Application = () => {
     });
   }, []);
 
-  useEffect(() => {
+  useEffect(async () => {
     firestore().collection("users")
       .doc(auth().currentUser.uid)
       .collection("appeals")
@@ -43,7 +44,7 @@ const Application = () => {
         setAppeals(appealss);
       });
 
-    if (isUserAdmin) getAllAppeal()
+    if (isUserAdmin) await getAllAppeal();
   }, []);
 
   useEffect(() => {
@@ -55,51 +56,74 @@ const Application = () => {
 
   }, [isSignedIn]);
 
-  const getAllAppeal = () => {
+  const getAllAppeal = async () => {
     firestore().collection("users")
       .onSnapshot(docs => {
         let allUsers = [];
         docs.forEach(doc => {
-          allUsers.push({id: doc.id});
+          allUsers.push({ id: doc.id });
         });
         setAllUserId(allUsers);
       });
-    let allAppeal = []
+    let allAppeal = [];
     allUserId.forEach(userId => {
-      let user = []
-      firestore().collection('users')
+      let user = [];
+      firestore().collection("users")
         .doc(userId?.id)
         .onSnapshot(docs => {
-          user.push(docs.data())
-        })
-
+          user.push(docs.data());
+        });
       firestore().collection("users")
         .doc(userId?.id)
         .collection("appeals")
         .onSnapshot(docs => {
           docs.forEach(doc => {
-            allAppeal.push({appealUUID: doc.data()?.appealUUID, user});
+            allAppeal.push({
+              appealType: doc.data()?.appealType,
+              appealUUID: doc.data()?.appealUUID,
+              isStart: doc.data()?.isStart,
+              userId: userId?.id,
+              user,
+            });
           });
-          setAdminAppeals(allAppeal)
+          setAdminAppeals(allAppeal);
         });
-    });
-  };
 
-  const getUserData = (userId) => {
-    return firestore().collection('users')
-      .doc(userId)
-      .get()
-  }
+    });
+
+  };
   return (
     <View style={{ flex: 1, padding: 16 }}>
       {
         isUserAdmin ?
           <>
-            <Button onPress={() => getAllAppeal()}>getAllAppeal</Button>
-            {adminAppeals.map((appeal) => (
-              <Text key={appeal.appealUUID}>{appeal.user?.[0]?.name}-----{appeal.appealUUID}</Text>
-            ))}
-            <Text>Admin User</Text>
+            <Button onPress={async () => await getAllAppeal()}>getAllAppeals</Button>
+            <ScrollView>
+              {adminAppeals.map((appeal) => (
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <View>
+                    {appeal.isStart === 2 ?
+                      <Icon name="alert" type="ionicon" color="red" size={14} />
+                      :
+                      <Icon name="checkmark" type="ionicon" color="#5AA658" size={14} />
+                    }
+                  </View>
+                  <View key={appeal.appealUUID} style={{
+                    flexDirection: "row",
+                    flex: 1,
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    padding: 6,
+                  }}>
+                    <Text>{appeal.user?.[0]?.name}</Text>
+                    <Text>{appeal.appealType === 0 ? "ÇAP Başvurusu" : appeal.appealType === 1 ? "DGS Başvurusu" : appeal.appealType === 2 ? "Yatay Geçiş Başvurusu" : appeal.appealType === 3 ? "Yaz Okulu" : "Ders İntibak Başvurusu"}</Text>
+                    <Pressable onPress={() => navigation.navigate('AppealDetail', {appealUUID: appeal?.appealUUID, userId: appeal?.userId})}>
+                      <Icon name="eye" type="ionicon" color="#5AA658" size={14} />
+                    </Pressable>
+                  </View>
+                </View>
+              ))}
+            </ScrollView>
           </>
           :
           <>

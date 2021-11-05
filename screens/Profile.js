@@ -151,7 +151,7 @@ const Settings = () => {
         }, {merge: true})
       await storage().ref("/images/userProfilePicture/" + userData?.profilePhoto).delete();
     }catch (e){
-      console.log(e.message)
+      //console.log(e.message)
     }
   }
 

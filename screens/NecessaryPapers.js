@@ -81,6 +81,10 @@ const NecessaryPapers = () => {
           isStart: 2,
           percent: 0,
           files:{},
+          result:{
+            status: 2,
+            description: null
+          },
           createdAt: Date.now()
         }, { merge: true });
       if(appealType === 0) navigation.navigate('DoubleMajorAppealScreen', {appealUUID: appealUUID});
